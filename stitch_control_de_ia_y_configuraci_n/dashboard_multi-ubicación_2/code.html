@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Control de Stock Avanzado | Gestión de Inventario</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0f18",
+                        "surface-dark": "#151c2c",
+                        "border-dark": "#232f48",
+                        "lumo-grid-hover": "#1e293b"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav {
+            color: #135bec;
+        }.custom-scrollbar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #151c2c;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #232f48;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark font-display text-slate-100 min-h-screen flex flex-col overflow-hidden">
+<header class="bg-surface-dark border-b border-border-dark px-4 py-3 flex items-center justify-between shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+<h1 class="text-sm font-bold tracking-tight">Control de Stock Avanzado</h1>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20">Sync OK</span>
+<div class="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
+<img alt="User" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAasikWMsCmjp8Y-7nNLJKWAD3jvU7E7yyr2_Utw68Y2i_T_Wm92Q_Bml4oq8fIYhBKTRZlAM3YMkDULzB3rcm2J2PrBWTq81s4axqf6qv5B78LOG7b4X8TZSZk5QxSIJhHijr5xNeW7K2i7LrU13_byYka8fSidRRpF1-0KotFOlMRwaaIOH2t528vRwnxDonGvbkZQgJNSk28ef0plS_M-5GlMPOHBmTP_e0MGDAMa0aYjuT2gaf7ZSbF1AIEqW1R9K-KNJfeXos"/>
+</div>
+</div>
+</header>
+<section class="bg-surface-dark/50 border-b border-border-dark px-4 py-3 shrink-0">
+<div class="flex flex-col gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="w-full bg-background-dark border-border-dark rounded-lg pl-9 pr-4 py-2 text-xs text-slate-200 focus:ring-primary focus:border-primary" placeholder="Buscar SKU o Nombre..." type="text"/>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+<select class="bg-background-dark border-border-dark rounded-lg text-[11px] py-1.5 pl-3 pr-8 focus:ring-primary min-w-[100px]">
+<option>Categoría</option>
+<option>Calzado</option>
+<option>Indumentaria</option>
+</select>
+<select class="bg-background-dark border-border-dark rounded-lg text-[11px] py-1.5 pl-3 pr-8 focus:ring-primary min-w-[110px]">
+<option>Woo Atributos</option>
+<option>Color</option>
+<option>Talle</option>
+</select>
+<select class="bg-background-dark border-border-dark rounded-lg text-[11px] py-1.5 pl-3 pr-8 focus:ring-primary min-w-[90px]">
+<option>Estado</option>
+<option>In Stock</option>
+<option>Out Stock</option>
+</select>
+</div>
+</div>
+</section>
+<main class="flex-1 overflow-x-auto custom-scrollbar bg-background-dark">
+<table class="w-full text-left border-collapse min-w-[700px]">
+<thead class="sticky top-0 z-10 bg-surface-dark text-[#92a4c9] text-[10px] font-bold uppercase tracking-wider border-b border-border-dark">
+<tr>
+<th class="px-4 py-3 w-16 text-center">Img</th>
+<th class="px-4 py-3">Producto / SKU</th>
+<th class="px-4 py-3 text-center">Salón</th>
+<th class="px-4 py-3 text-center">Depósito</th>
+<th class="px-4 py-3 text-center">Taller</th>
+<th class="px-4 py-3 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-dark/50">
+<tr class="hover:bg-lumo-grid-hover transition-colors">
+<td class="px-4 py-3">
+<img class="w-10 h-10 rounded bg-surface-dark object-cover mx-auto border border-border-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3FzE65Wnuyb1dPwf20_UpxA7cAMElFcyuUTwNh8sVgjkRRHBHQ2qcgOUiuHAbErV0p9j_0cnTuDdkYjlS8LCHPCQCiHOPFiRgLGPweUl746aNchrGth1b6j6TkroBZ0ypGxm22L7QMd2OtVzWdpNqZU8nf9WyuzjvemOszICxDT37VnCKopTWnwg_pcw_xL-qfCwiIyktj6SF8rVEFpupmErDYho7C69tSIoIMm60abT_AX4MWP9CIJ45r50xY0R6QqLxclzQwX8"/>
+</td>
+<td class="px-4 py-3">
+<div class="text-xs font-bold text-white">Nike Air Max 270</div>
+<div class="text-[10px] text-slate-500">SKU-2094 • Calzado</div>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">12</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium text-emerald-400">45</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">0</span>
+</td>
+<td class="px-4 py-3 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary/20 rounded text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-emerald-500/20 rounded text-slate-400 hover:text-emerald-500 transition-colors">
+<span class="material-symbols-outlined text-lg">playlist_add</span>
+</button>
+<button class="p-1.5 hover:bg-red-500/20 rounded text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-lg">restart_alt</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-lumo-grid-hover transition-colors">
+<td class="px-4 py-3">
+<img class="w-10 h-10 rounded bg-surface-dark object-cover mx-auto border border-border-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN78o1vFh2fCwUG4F9uTcHh3VtY9QRvCMcUkYyiYwiDPbyuqauwnfRVXg4cDQShav7WVPL026X66dtcXpex-W3HUk8oq9a5hSmu0hStEggdDCLR8RGOX3QDEbJa4dC_21ZqVVliFUFE7DqMdrcXcTEE0s4heB2R3m-uZY_LRDGIeRFnVWhek_7lCtxE72I2XJjAoYhnKHs5VG3VnOSJrB7T52-OmWZ_qIEUZQLlOyK89k5dNzZdM54WgzzUJnrPpxwaIixHw5fZfs"/>
+</td>
+<td class="px-4 py-3">
+<div class="text-xs font-bold text-white">Watch Series 7 Pro</div>
+<div class="text-[10px] text-slate-500">SKU-W-102 • Accesorios</div>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium text-red-400">2</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">8</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">5</span>
+</td>
+<td class="px-4 py-3 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary/20 rounded text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-emerald-500/20 rounded text-slate-400 hover:text-emerald-500 transition-colors">
+<span class="material-symbols-outlined text-lg">playlist_add</span>
+</button>
+<button class="p-1.5 hover:bg-red-500/20 rounded text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-lg">restart_alt</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-lumo-grid-hover transition-colors">
+<td class="px-4 py-3">
+<img class="w-10 h-10 rounded bg-surface-dark object-cover mx-auto border border-border-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuVdHCNUpRma3BtHqYVISv-j7f4M_UmPe4s70if9EVIjAJlKQikZuoQgfWqi4DeOuh8wtp1uBwpk3oZDdh7U_Nl4HcW7r1w4StSXp6sT3aBNZ18VnervvZussc0chpFJ9urHwHShrGzVNwid-27NzDJlZ3ZCCI7w2yGAzcPsDmDgZlrTZXLx6E1cl4YnjLdQAcCYhJKhD1oTM3TcQ-2eVfemaEE9mSQq7KJ_KP2gOB6kB9frS90O7cNMXxwem9d-Os05f2uMPcwR0"/>
+</td>
+<td class="px-4 py-3">
+<div class="text-xs font-bold text-white">Cotton T-Shirt Basic</div>
+<div class="text-[10px] text-slate-500">SKU-T-881 • Indumentaria</div>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">150</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">320</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">0</span>
+</td>
+<td class="px-4 py-3 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary/20 rounded text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-emerald-500/20 rounded text-slate-400 hover:text-emerald-500 transition-colors">
+<span class="material-symbols-outlined text-lg">playlist_add</span>
+</button>
+<button class="p-1.5 hover:bg-red-500/20 rounded text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-lg">restart_alt</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-lumo-grid-hover transition-colors">
+<td class="px-4 py-3">
+<img class="w-10 h-10 rounded bg-surface-dark object-cover mx-auto border border-border-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMLsA5AXmG0t37f25lJq5HHgLnGyOTjjfVSpNpWacaD1mdXAFKUIwfrUS56VUn3LOqI6yRg8MFG5zTOoGaTnYUHmjMcuA5gXQVgDCuQknLLNqw_CbOl-pTDjM7Pbn0RKiKvSLM0SpqNxAYe8L0PWqld04LlPwgsKMtPj1TUA8LWW3ydHX-3Fw12xI8Jkkh65DU1dqcLz-Yfkn-UDMNrRdAxacveF1osKlpgcwGtwx-vUfLKhjpPpyHGn44qlJRoY-BT9o9DvV9cn8"/>
+</td>
+<td class="px-4 py-3">
+<div class="text-xs font-bold text-white">Levis 501 Denim</div>
+<div class="text-[10px] text-slate-500">SKU-J-404 • Indumentaria</div>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">45</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">120</span>
+</td>
+<td class="px-4 py-3 text-center">
+<span class="text-xs font-medium">12</span>
+</td>
+<td class="px-4 py-3 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-1.5 hover:bg-primary/20 rounded text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+<button class="p-1.5 hover:bg-emerald-500/20 rounded text-slate-400 hover:text-emerald-500 transition-colors">
+<span class="material-symbols-outlined text-lg">playlist_add</span>
+</button>
+<button class="p-1.5 hover:bg-red-500/20 rounded text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-lg">restart_alt</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</main>
+<div class="bg-primary/95 backdrop-blur-sm px-4 py-3 flex items-center justify-between border-t border-primary/20 shadow-2xl shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-white text-lg animate-pulse">pending_actions</span>
+<div class="flex flex-col">
+<span class="text-[11px] font-bold text-white">4 Cambios pendientes</span>
+<span class="text-[9px] text-white/80">Aún no sincronizado con Woo</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="text-[10px] font-bold text-white/70 hover:text-white px-2 py-1 uppercase">Restaurar</button>
+<button class="bg-white text-primary text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1">
+            SINCRONIZAR <span class="material-symbols-outlined text-[14px]">sync</span>
+</button>
+</div>
+</div>
+<nav class="bg-surface-dark border-t border-border-dark px-2 pb-5 pt-2 shrink-0">
+<div class="max-w-md mx-auto flex justify-around items-center">
+<a class="flex flex-col items-center gap-1 text-slate-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 active-nav px-3 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">inventory_2</span>
+<span class="text-[10px] font-medium">Stock</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined">sync</span>
+<span class="text-[10px] font-medium">Historial</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 px-3 py-1 relative" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[10px] font-medium">AI Insight</span>
+<span class="absolute top-0 right-1 w-1.5 h-1.5 bg-primary rounded-full border border-surface-dark"></span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 px-3 py-1" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Ajustes</span>
+</a>
+</div>
+</nav>
+
+</body></html>

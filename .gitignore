@@ -1,0 +1,49 @@
+# StockDual
+
+## Build
+target/
+*.class
+*.jar
+*.war
+
+## Maven
+.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.properties
+
+## IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.factorypath
+.vscode/
+*.code-workspace
+
+## Node / Vaadin
+node_modules/
+node/
+frontend/generated/
+package-lock.json
+pnpmfile.js
+pnpm-lock.yaml
+webpack.generated.js
+vite.generated.ts
+vite.config.ts
+tsconfig.json
+types.d.ts
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Env
+.env
+.env.local
+*.log
+
+## Docker
+docker-compose.override.yml

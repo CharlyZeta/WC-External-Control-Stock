@@ -1,0 +1,473 @@
+/*
+ * StockDual — Tema Dark Custom
+ * Basado en diseño Stitch: Dark mode, Inter font, color primario #135bec
+ */
+
+/* ============================================
+   Vaadin Lumo Theme Overrides — Dark Mode
+   ============================================ */
+
+html {
+    --lumo-base-color: #101622;
+    --lumo-primary-color: #135bec;
+    --lumo-primary-color-50pct: rgba(19, 91, 236, 0.5);
+    --lumo-primary-color-10pct: rgba(19, 91, 236, 0.1);
+    --lumo-primary-text-color: #4d8ef7;
+
+    --lumo-header-text-color: #e8ecf4;
+    --lumo-body-text-color: #c5cee0;
+    --lumo-secondary-text-color: #92a4c9;
+    --lumo-tertiary-text-color: #6b7fa3;
+    --lumo-disabled-text-color: #4a5a78;
+
+    --lumo-error-color: #ef4444;
+    --lumo-success-color: #10b981;
+    --lumo-warning-color: #f59e0b;
+
+    --lumo-shade-5pct: rgba(0, 0, 0, 0.05);
+    --lumo-shade-10pct: rgba(0, 0, 0, 0.1);
+    --lumo-shade-20pct: rgba(0, 0, 0, 0.2);
+    --lumo-shade-50pct: rgba(0, 0, 0, 0.5);
+    --lumo-shade: #101622;
+
+    --lumo-contrast-5pct: rgba(255, 255, 255, 0.05);
+    --lumo-contrast-10pct: rgba(255, 255, 255, 0.08);
+    --lumo-contrast-20pct: rgba(255, 255, 255, 0.12);
+    --lumo-contrast-50pct: rgba(255, 255, 255, 0.3);
+    --lumo-contrast-60pct: rgba(255, 255, 255, 0.5);
+    --lumo-contrast-70pct: rgba(255, 255, 255, 0.6);
+    --lumo-contrast-80pct: rgba(255, 255, 255, 0.75);
+    --lumo-contrast-90pct: rgba(255, 255, 255, 0.85);
+    --lumo-contrast: #ffffff;
+
+    --lumo-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --lumo-border-radius-m: 8px;
+    --lumo-border-radius-l: 12px;
+    --lumo-border-radius-s: 6px;
+
+    /* Custom colors */
+    --sd-bg-primary: #101622;
+    --sd-bg-surface: #192233;
+    --sd-bg-elevated: #1e2a3f;
+    --sd-border: #232f48;
+    --sd-accent: #135bec;
+    --sd-text-primary: #e8ecf4;
+    --sd-text-secondary: #92a4c9;
+    --sd-text-muted: #6b7fa3;
+
+    font-family: var(--lumo-font-family);
+    background-color: var(--sd-bg-primary);
+    color: var(--sd-text-primary);
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   App Layout — Header & Drawer
+   ============================================ */
+
+vaadin-app-layout {
+    --vaadin-app-layout-navbar-background: var(--sd-bg-surface);
+    --vaadin-app-layout-drawer-background: var(--sd-bg-surface);
+}
+
+vaadin-app-layout::part(navbar) {
+    border-bottom: 1px solid var(--sd-border);
+    min-height: 56px;
+}
+
+vaadin-app-layout::part(drawer) {
+    border-right: 1px solid var(--sd-border);
+    width: 260px;
+}
+
+.header {
+    background: var(--sd-bg-surface);
+}
+
+.app-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--sd-text-primary);
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.header-right {
+    gap: 12px;
+}
+
+.user-display {
+    font-size: 0.85rem;
+    color: var(--sd-text-secondary);
+    font-weight: 500;
+}
+
+.logout-btn {
+    color: var(--sd-text-muted);
+    font-size: 0.8rem;
+}
+
+/* Drawer */
+.drawer-logo-section {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--sd-border);
+}
+
+.drawer-logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--sd-accent);
+    margin: 0;
+    letter-spacing: -0.03em;
+}
+
+.drawer-version {
+    font-size: 0.7rem;
+    color: var(--sd-text-muted);
+    margin: 4px 0 0 0;
+}
+
+.drawer-scroller {
+    padding: 8px 0;
+}
+
+.nav-separator {
+    margin: 12px 16px;
+    border-color: var(--sd-border);
+}
+
+/* Side Navigation */
+vaadin-side-nav-item {
+    --_focus-ring-color: var(--sd-accent);
+}
+
+vaadin-side-nav-item::part(content) {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--sd-text-secondary);
+    padding: 10px 16px;
+    border-radius: 8px;
+    margin: 2px 8px;
+    transition: all 0.15s ease;
+}
+
+vaadin-side-nav-item::part(content):hover {
+    background: var(--sd-bg-elevated);
+    color: var(--sd-text-primary);
+}
+
+vaadin-side-nav-item[active]::part(content) {
+    background: rgba(19, 91, 236, 0.12);
+    color: var(--sd-accent);
+    font-weight: 600;
+}
+
+/* ============================================
+   Login View - Glassmorphism & Mesh Background
+   ============================================ */
+
+.login-view {
+    position: relative;
+    overflow: hidden;
+    background-color: #0b0f19;
+    /* Deep dark background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100vw;
+}
+
+/* Animated Blobs for Background */
+.login-blob-1,
+.login-blob-2,
+.login-blob-3 {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.6;
+    animation: floatBlob 20s infinite alternate ease-in-out;
+}
+
+.login-blob-1 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #135bec, #0a3d9e);
+    top: -10%;
+    left: -10%;
+    animation-delay: 0s;
+}
+
+.login-blob-2 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #8b5cf6, #5b21b6);
+    bottom: -10%;
+    right: -5%;
+    animation-delay: -5s;
+}
+
+.login-blob-3 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, #0ea5e9, #0369a1);
+    top: 40%;
+    left: 40%;
+    animation-delay: -10s;
+}
+
+@keyframes floatBlob {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+
+    66% {
+        transform: translate(-30px, 20px) scale(0.9);
+    }
+
+    100% {
+        transform: translate(20px, 40px) scale(1.05);
+    }
+}
+
+/* Glassmorphism Card */
+.login-glass-card {
+    position: relative;
+    z-index: 1;
+    /* Above blobs */
+    background: rgba(16, 22, 34, 0.45);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 36px;
+    padding: 48px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(0);
+    animation: cardEntrance 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.login-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    /* Gradient Text */
+    background: linear-gradient(135deg, #ffffff 0%, #a5b4cb 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.04em;
+}
+
+.login-subtitle {
+    font-size: 0.95rem;
+    color: #92a4c9;
+    text-align: center;
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+}
+
+/* Vaadin LoginForm internal cleanup */
+.login-view vaadin-login-form {
+    width: 100%;
+    --vaadin-login-form-background: transparent;
+}
+
+vaadin-login-form::part(form) {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* ============================================
+   View Titles & Placeholders
+   ============================================ */
+
+.view-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sd-text-primary);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.02em;
+}
+
+.placeholder-card {
+    background: var(--sd-bg-surface);
+    border: 1px dashed var(--sd-border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.placeholder-icon {
+    color: var(--sd-text-muted);
+    opacity: 0.5;
+}
+
+.placeholder-icon vaadin-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.placeholder-text {
+    color: var(--sd-text-muted);
+    font-size: 0.9rem;
+    max-width: 400px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ============================================
+   Dashboard Stat Cards
+   ============================================ */
+
+.stats-row {
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: var(--sd-bg-surface);
+    border: 1px solid var(--sd-border);
+    border-radius: 12px;
+    padding: 20px;
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.stat-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card-blue .stat-icon {
+    background: rgba(19, 91, 236, 0.12);
+    color: #4d8ef7;
+}
+
+.stat-card-green .stat-icon {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+}
+
+.stat-card-orange .stat-icon {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+}
+
+.stat-card-gray .stat-icon {
+    background: rgba(107, 127, 163, 0.12);
+    color: #6b7fa3;
+}
+
+.stat-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--sd-text-primary);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--sd-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ============================================
+   General Overrides
+   ============================================ */
+
+vaadin-button[theme~="primary"] {
+    background: var(--sd-accent);
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+vaadin-text-field,
+vaadin-password-field,
+vaadin-select {
+    --vaadin-input-field-background: var(--sd-bg-elevated);
+    --vaadin-input-field-border-color: var(--sd-border);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--sd-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--sd-border);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--sd-text-muted);
+}
+
+/* ============================================
+   Grid Styles
+   ============================================ */
+
+/* Resalta toda la fila cuando hay discrepancia */
+vaadin-grid::part(stock-mismatch-row) {
+    color: var(--lumo-error-text-color);
+    background-color: rgba(239, 68, 68, 0.05);
+}
+
+/* Fuerza el resaltado en la celda individual con "font-weight" agresivo */
+vaadin-grid::part(stock-mismatch-cell) {
+    color: var(--lumo-error-text-color);
+    font-weight: 800;
+}

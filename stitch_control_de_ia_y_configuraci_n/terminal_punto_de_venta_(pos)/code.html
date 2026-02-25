@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>POS - Terminal de Venta</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased overflow-hidden h-screen flex flex-col">
+<!-- Header / Search Section -->
+<header class="flex flex-col gap-3 px-4 pt-4 pb-2 bg-background-light dark:bg-background-dark border-b border-primary/10">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">point_of_sale</span>
+<h1 class="text-lg font-bold tracking-tight">Terminal Salón</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+<span class="material-symbols-outlined text-xs">sync</span>
+                    WooCommerce
+                </div>
+<button class="flex items-center justify-center size-10 rounded-full bg-slate-200 dark:bg-primary/20">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full">
+<label class="flex items-center w-full h-12 px-4 rounded-xl bg-slate-200 dark:bg-slate-800/50 border border-transparent focus-within:border-primary/50 transition-all">
+<span class="material-symbols-outlined text-slate-500 mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-sm font-medium placeholder:text-slate-500" placeholder="Buscar productos o clientes..." type="text"/>
+<span class="material-symbols-outlined text-slate-500 ml-2">barcode_scanner</span>
+</label>
+</div>
+<!-- Category Horizontal Scroll -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+<button class="flex-none px-5 py-2 rounded-lg bg-primary text-white text-sm font-semibold shadow-lg shadow-primary/20">Todo</button>
+<button class="flex-none px-5 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Bebidas</button>
+<button class="flex-none px-5 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Comida</button>
+<button class="flex-none px-5 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Postres</button>
+<button class="flex-none px-5 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Vinos</button>
+<button class="flex-none px-5 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-sm font-medium">Ofertas</button>
+</div>
+</header>
+<!-- Main Content Area: Product Grid + Sidebar -->
+<main class="flex-1 flex overflow-hidden relative">
+<!-- Product Grid (Scrollable) -->
+<section class="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 gap-3 no-scrollbar pb-32">
+<!-- Product Tile 1 -->
+<div class="group relative flex flex-col bg-slate-100 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-transparent hover:border-primary/30 transition-all active:scale-95 cursor-pointer">
+<div class="aspect-square bg-cover bg-center" data-alt="Classic beef burger with lettuce and tomato" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD3XrJXvU7Sjb6J8ovKntHUSDtHEXyT88iwbgwiJKyzfa3XYS2YXctaD8AikoMLS4IlHA5Ud1NpjjTvd-qqkWDPis8LQmi36jr5a1rJCSfABIa7e9N4pU2GGpMATUmhCS0-dpFWJMT8HAq9mUTbEy_G7jyoRtyuPHmNfJr3s_4ehL4skisk5Q3b9liC0AWOoHofwewULmqZ7Z_S8AX9ysbH7QE2RwmiW-IoOo4ZSmXHEWJjTE5yQ0wbKbx6T7Y342R02uoocLn6T3s");'></div>
+<div class="p-3">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Comida</p>
+<p class="text-sm font-bold truncate">Hamburguesa Clásica</p>
+<div class="mt-2 flex items-center justify-between">
+<span class="text-primary font-bold">12.50€</span>
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+</div>
+</div>
+<div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-amber-500 text-[10px] font-bold text-white flex items-center gap-1 shadow-md">
+<span class="material-symbols-outlined text-[12px]">auto_awesome</span> AI
+                </div>
+</div>
+<!-- Product Tile 2 -->
+<div class="flex flex-col bg-slate-100 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-transparent active:scale-95 cursor-pointer">
+<div class="aspect-square bg-cover bg-center" data-alt="Freshly baked margarita pizza with basil" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuATBdMcGFxAtzIcJwpbv8YC9qsx7gnbMVevlACHdWTXyYLq-9FIV-ZgyNeGV9jOha0Me3bCJU_dHyXXX66xO_WlDBAAOHz6qkos0gfCxbXmAw-AkcNP47Mo3KmDfsg6pyDrOzWMDaGAA3R5_B0s3dZAe_57b5yE_keuhos8izF-i6xGr7S8QfRAyp8s0nz4HBGkrMuLffJhuhN1BkAAro2Cpso4CqwROmiBBPpIOM5QH6ST-S_Gzc5iF7NpUtNfiGl-9nv5fmko-lA");'></div>
+<div class="p-3">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Comida</p>
+<p class="text-sm font-bold truncate">Pizza Margarita</p>
+<div class="mt-2 flex items-center justify-between">
+<span class="text-primary font-bold">10.00€</span>
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Tile 3 -->
+<div class="flex flex-col bg-slate-100 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-transparent active:scale-95 cursor-pointer">
+<div class="aspect-square bg-cover bg-center" data-alt="Craft beer glass with foam" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAHk0lLxJLl-v28HAxAOAov0HchLMHpwHK_K3_-SWbXkNVw1NC2LTVverK65GXKt5eOIRytunCNA16SJ_mXm9s68TKMUVdkvW1UOz_P83Oai8w-8M_P4IH7Um_tlWuruaKI240Y2jGTq5KYx_fzhUWjQbMe-HVowVN3IrN1-Qq0m_SkB8yfLw8HLvfn0qV3JRdz7GBotTmQ0VEcv89iPF2qa8SUTlxhSI3DmAbMLLw4GOgNSAfggTExrhdlnPtqAcSyNLyZ9TFLJW4");'></div>
+<div class="p-3">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Bebidas</p>
+<p class="text-sm font-bold truncate">Cerveza IPA Artesana</p>
+<div class="mt-2 flex items-center justify-between">
+<span class="text-primary font-bold">4.50€</span>
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Tile 4 -->
+<div class="flex flex-col bg-slate-100 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-transparent active:scale-95 cursor-pointer">
+<div class="aspect-square bg-cover bg-center" data-alt="New York style cheesecake slice" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBitycMT7youeX4aPEAfnZMVc2cAevnvGoLPXgrFllaK_G7KArxf3S6NOvHIRnfAcYcYR-0U99EIo0stPluvDpHJgzIxZySZ0-I085f-hSVtYFwB6ey_TBbmZTquFZ8GfgMMLaUXBtBgCh-i235luZea-IM142bRyt2Pnmmcu-4dnaRFQHKl0DBWeIvFs-VSdGbnMH_z15-LCrckqcVcIO-wpRaTq074JSS9tOpK9YQLn8AcWUjmoAAChrl2dOcNQMcGsqM1VQZz-k");'></div>
+<div class="p-3">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Postres</p>
+<p class="text-sm font-bold truncate">Tarta de Queso</p>
+<div class="mt-2 flex items-center justify-between">
+<span class="text-primary font-bold">6.00€</span>
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Tile 5 -->
+<div class="flex flex-col bg-slate-100 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-transparent active:scale-95 cursor-pointer">
+<div class="aspect-square bg-cover bg-center" data-alt="Glass of red wine" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuChv12SkK7jkT46mtwWpWI-pjkoNC99kImzvEvFhGDtyUsgvqUcLuGq4HE8ZPeQrAGxOefgVBix2KhyV-MtQoR_B0jk-VjQDtvWnADpZ-YOxvKwCgSe2HRzE4lzRhrqvyleeZGKTacmavRJwZm0u4Edp_fiMJoE3mgovTARmlad_WiTOjTOlrtWU8CJ_KWjizMC3viN3pDoGGOccW4kdx94qphJ8wJfMSpuJu1DJje3di1O8RtdZXNEQnZvs_U6u6JnoJcgsJjOtTo");'></div>
+<div class="p-3">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Vinos</p>
+<p class="text-sm font-bold truncate">Copa Vino Tinto</p>
+<div class="mt-2 flex items-center justify-between">
+<span class="text-primary font-bold">3.50€</span>
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Product Tile 6 -->
+<div class="flex flex-col bg-slate-100 dark:bg-slate-800/40 rounded-xl overflow-hidden border border-transparent active:scale-95 cursor-pointer">
+<div class="aspect-square bg-cover bg-center" data-alt="Large caesar salad bowl" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCPh66xz3jl9pV2Tn4G_JTmamEc8lEW2KgxlSoez2gMZu9wseN2BRkdsPEv3x_UOdeHQCB7RR6ucEyu9QwSSfh6dtQc3OmPM4qTfpS-Osx6-m144vMzc_4NcVenz5YQtrjTD8wxnsT__Fw4ygEWZ5QRl3pT5E7a1BLAl94nGG38TrXr4A43Ig8dKQB55cJ_NxqIU8rpz10oABWeJSLR_KRV5A5TDJ0l-PglD0wOCJfQe8OGDr9WZhCPR4-UBQjMY6AAvd9URxueR5s");'></div>
+<div class="p-3">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Comida</p>
+<p class="text-sm font-bold truncate">Ensalada César</p>
+<div class="mt-2 flex items-center justify-between">
+<span class="text-primary font-bold">9.20€</span>
+<div class="size-8 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sidebar / Cart (iOS Peek Overlay Style for Phone) -->
+<aside class="absolute bottom-16 left-0 right-0 h-2/3 bg-background-light dark:bg-slate-900 border-t border-primary/20 rounded-t-3xl shadow-2xl z-20 flex flex-col transform transition-transform translate-y-[82%] sm:translate-y-0 sm:relative sm:w-80 sm:h-full sm:rounded-none sm:border-l sm:border-t-0">
+<!-- Drag Indicator (Mobile) -->
+<div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto my-3 sm:hidden"></div>
+<div class="flex items-center justify-between px-6 py-2 border-b border-primary/5">
+<div class="flex flex-col">
+<h2 class="text-lg font-bold">Carrito</h2>
+<p class="text-xs text-slate-500">Mesa 4 • Atendido por Juan</p>
+</div>
+<button class="material-symbols-outlined text-slate-400">delete</button>
+</div>
+<div class="flex-1 overflow-y-auto px-6 py-4 space-y-4 no-scrollbar">
+<!-- Cart Item 1 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex flex-col items-center justify-center size-8 rounded bg-primary/10 text-primary font-bold text-sm">2x</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Hamburguesa Clásica</span>
+<span class="text-[10px] text-slate-500 italic">+ Sin cebolla</span>
+</div>
+</div>
+<span class="text-sm font-bold">25.00€</span>
+</div>
+<!-- Cart Item 2 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex flex-col items-center justify-center size-8 rounded bg-primary/10 text-primary font-bold text-sm">1x</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Copa Vino Tinto</span>
+</div>
+</div>
+<span class="text-sm font-bold">3.50€</span>
+</div>
+<!-- AI Recommendation Row -->
+<div class="mt-8 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-amber-500 text-sm">auto_awesome</span>
+<span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-500">AI Sugerencia</span>
+</div>
+<div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2 rounded-lg border border-amber-500/10 active:scale-95 cursor-pointer transition-transform">
+<div class="flex items-center gap-2">
+<div class="size-8 rounded bg-cover bg-center" data-alt="Craft beer thumbnail" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB80eBmYUuiYHKAMJoWYUuuIpUumKaYwQs4scldHxue16azaqP_jtKp0WEclARjZdZ3LAY4_tXj90BaCtC3gdhgwyopce-mQS4b7qmVA_co6JhRie2OMvxUasBfZg8Tm9uGZaV8W_LpD5m2ig30b0CM3tG5YFSiPVszSwwd7Z7zCTeSlxerNSUlLti4XirMIYvzLQ_0qglwi6Zi-TMTEDEOK2TSsp7c9MCrb4azJyNQOqygC9DbPh_D8uHWYAYd4-Vbf31nl7Ddm4g");'></div>
+<span class="text-xs font-medium">Sugerir Cerveza Artesana</span>
+</div>
+<span class="material-symbols-outlined text-amber-500">add_circle</span>
+</div>
+</div>
+</div>
+<!-- Cart Footer Summary -->
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/60 border-t border-primary/10 space-y-2">
+<div class="flex justify-between text-sm text-slate-500">
+<span>Subtotal</span>
+<span>28.50€</span>
+</div>
+<div class="flex justify-between text-sm text-slate-500">
+<span>Impuestos (10%)</span>
+<span>2.85€</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-base font-bold">Total</span>
+<span class="text-2xl font-black text-primary">31.35€</span>
+</div>
+<button class="w-full h-14 rounded-xl bg-primary text-white font-bold text-lg flex items-center justify-center gap-2 shadow-xl shadow-primary/30 active:scale-[0.98] transition-all">
+                    Finalizar Pedido
+                    <span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</aside>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="flex h-16 w-full items-center justify-around bg-background-light dark:bg-slate-900 border-t border-primary/10 px-2 z-30">
+<a class="flex flex-col items-center justify-center gap-0.5 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">storefront</span>
+<p class="text-[10px] font-bold uppercase tracking-wide">Salón</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 text-slate-500" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<p class="text-[10px] font-bold uppercase tracking-wide">Pedidos</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 text-slate-500" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<p class="text-[10px] font-bold uppercase tracking-wide">Stock</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 text-slate-500" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<p class="text-[10px] font-bold uppercase tracking-wide">Reportes</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-0.5 text-slate-500" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-[10px] font-bold uppercase tracking-wide">Ajustes</p>
+</a>
+</nav>
+</body></html>

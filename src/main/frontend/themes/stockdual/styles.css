@@ -1,0 +1,11 @@
+@import 'loader.css';
+/* Main styles file for the theme */
+
+.stock-mismatch-cell {
+    color: var(--lumo-error-text-color) !important;
+    font-weight: 600 !important;
+}
+
+vaadin-grid::part(cell).stock-mismatch-cell {
+    color: var(--lumo-error-text-color) !important;
+}

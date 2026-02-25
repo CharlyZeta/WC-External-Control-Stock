@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: StockDual
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/stockdual
+    username: stockdual
+    password: stockdual_dev_2024
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+vaadin:
+  launch-browser: true
+  whitelisted-packages:
+    - com.stockdual
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.stockdual: DEBUG
+    org.springframework.security: INFO

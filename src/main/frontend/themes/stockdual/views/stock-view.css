@@ -1,0 +1,28 @@
+.stock-view .content {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+.stock-view .contact-grid {
+    flex: 1;
+}
+
+.stock-view .product-form {
+    width: 25em;
+    padding: var(--lumo-space-l);
+    border-left: 1px solid var(--lumo-contrast-10pct);
+    display: flex;
+    flex-direction: column;
+}
+
+.stock-view.editing .contact-grid {
+    display: none;
+}
+
+/* On large screens, show side-by-side */
+@media (min-width: 1100px) {
+    .stock-view.editing .contact-grid {
+        display: block;
+    }
+}
