@@ -16,6 +16,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import com.vaadin.flow.theme.lumo.LumoUtility;
@@ -35,6 +36,21 @@ public class MainLayout extends AppLayout {
         createDrawer();
     }
 
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        // Apply theme based on localStorage or OS preference (safe to call here, UI is
+        // attached)
+        getUI().ifPresent(ui -> ui.getPage().executeJs(
+                "const theme = localStorage.getItem('theme');" +
+                        "if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {"
+                        +
+                        "  document.documentElement.setAttribute('theme', 'dark');" +
+                        "} else {" +
+                        "  document.documentElement.removeAttribute('theme');" +
+                        "}"));
+    }
+
     private void createHeader() {
         DrawerToggle toggle = new DrawerToggle();
         toggle.addClassName("drawer-toggle");
@@ -52,16 +68,6 @@ public class MainLayout extends AppLayout {
         String username = authContext.getPrincipalName().orElse("Usuario");
         Span userSpan = new Span(username);
         userSpan.addClassName("user-display");
-
-        // Theme toggle initialization and button
-        UI.getCurrent().getPage().executeJs(
-                "const theme = localStorage.getItem('theme');" +
-                        "if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {"
-                        +
-                        "  document.documentElement.setAttribute('theme', 'dark');" +
-                        "} else {" +
-                        "  document.documentElement.removeAttribute('theme');" +
-                        "}");
 
         Button themeToggle = new Button(VaadinIcon.ADJUST.create());
         themeToggle.addClickListener(e -> {

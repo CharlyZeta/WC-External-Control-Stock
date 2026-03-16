@@ -47,3 +47,6 @@ desktop.ini
 
 ## Docker
 docker-compose.override.yml
+
+## Agents
+.agents/

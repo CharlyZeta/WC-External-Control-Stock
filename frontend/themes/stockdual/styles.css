@@ -461,13 +461,14 @@ vaadin-select {
    ============================================ */
 
 /* Resalta toda la fila cuando hay discrepancia */
-vaadin-grid::part(stock-mismatch-row) {
-    color: var(--lumo-error-text-color);
-    background-color: rgba(239, 68, 68, 0.05);
+vaadin-grid::part(body-cell stock-mismatch-row) {
+    background-color: rgba(239, 68, 68, 0.15) !important; /* Soft red background for the entire row */
+    color: #ffdce0 !important;
 }
 
-/* Fuerza el resaltado en la celda individual con "font-weight" agresivo */
-vaadin-grid::part(stock-mismatch-cell) {
-    color: var(--lumo-error-text-color);
-    font-weight: 800;
+/* Fuerza el resaltado en la celda individual con "font-weight" agresivo y fondo más denso */
+vaadin-grid::part(body-cell stock-mismatch-cell) {
+    background-color: rgba(239, 68, 68, 0.4) !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
 }

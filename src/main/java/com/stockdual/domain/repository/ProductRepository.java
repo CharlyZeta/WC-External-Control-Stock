@@ -20,6 +20,12 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @EntityGraph(attributePaths = { "category", "brand", "supplier" })
     List<Product> findAll(Specification<Product> spec);
 
+    @EntityGraph(attributePaths = { "category", "brand", "supplier" })
+    List<Product> findAll(Specification<Product> spec, org.springframework.data.domain.Sort sort);
+
+    @EntityGraph(attributePaths = { "category", "brand", "supplier" })
+    List<Product> findAll(org.springframework.data.domain.Sort sort);
+
     @Query("select p from Product p left join fetch p.category " +
             "where lower(p.name) like lower(concat('%', :searchTerm, '%')) " +
             "or lower(p.sku) like lower(concat('%', :searchTerm, '%')) " +

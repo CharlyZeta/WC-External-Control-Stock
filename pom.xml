@@ -13,8 +13,8 @@
 
     <groupId>com.stockdual</groupId>
     <artifactId>stockdual</artifactId>
-    <version>0.4.1</version>
-    <name>StockDual</name>
+    <version>0.4.4</version>
+    <name>stockdual</name>
     <description>Control de Stock Multi-ubicación con integración WooCommerce</description>
 
     <properties>

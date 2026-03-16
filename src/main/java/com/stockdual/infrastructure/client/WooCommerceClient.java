@@ -32,7 +32,8 @@ public class WooCommerceClient {
             return false;
         }
 
-        String endpoint = formatEndpoint(url, "/wp-json/wc/v3/");
+        // We test against an endpoint that strictly requires authentication
+        String endpoint = formatEndpoint(url, "/wp-json/wc/v3/system_status");
         HttpEntity<String> entity = new HttpEntity<>(createAuthHeaders(key, secret));
 
         try {

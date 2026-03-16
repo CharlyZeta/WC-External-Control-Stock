@@ -56,6 +56,12 @@ public class Product {
     @Builder.Default
     private Integer stockWc = 0;
 
+    @Column(name = "wc_category", length = 200)
+    private String wcCategory;
+
+    @Column(name = "image_url", length = 1000)
+    private String imageUrl;
+
     @Column(name = "wc_id", unique = true)
     private Long wcId;
 

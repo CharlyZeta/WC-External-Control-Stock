@@ -70,6 +70,34 @@ public class ProductService {
         productRepository.deleteAllUnlinkedProducts();
     }
 
+    @Transactional
+    public void deleteAllProducts() {
+        productRepository.deleteAll();
+    }
+
+    @Transactional
+    public int overwriteLocalStockWithWc() {
+        List<Product> products = productRepository.findAll();
+        int updatedCount = 0;
+        for (Product p : products) {
+            int wcStock = p.getStockWc() != null ? p.getStockWc() : 0;
+            int currentLocal = p.getStockLocal() != null ? p.getStockLocal() : 0;
+            int currentDep = p.getStockDeposito() != null ? p.getStockDeposito() : 0;
+            int currentGal = p.getStockGalpon() != null ? p.getStockGalpon() : 0;
+            int currentTotal = p.getStockTotal() != null ? p.getStockTotal() : 0;
+            
+            if (currentLocal != wcStock || currentDep != 0 || currentGal != 0 || currentTotal != wcStock) {
+                p.setStockLocal(wcStock);
+                p.setStockDeposito(0);
+                p.setStockGalpon(0);
+                p.setStockTotal(wcStock);
+                updatedCount++;
+            }
+        }
+        productRepository.saveAll(products);
+        return updatedCount;
+    }
+
     public void saveProduct(Product product) {
         if (product == null) {
             System.err.println("Product is null. Are you sure you have connected your form to the application?");

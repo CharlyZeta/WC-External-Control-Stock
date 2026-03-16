@@ -1,5 +1,15 @@
 # Changelog - StockDual
 Todas las modificaciones, mejoras y arreglos a este proyecto serán documentados en este archivo. El versionado seguirá una estructura SemVer (x.y.z).
+## [0.4.4] - WooCommerce Attributes Sync & UI Cleanup
+- **ADDED**: Sincronización de atributos personalizados desde WooCommerce (Proveedor, Marca, GTIN) procesando tanto `attributes` como `meta_data`.
+- **CHANGED**: Se implementó el salvado y búsqueda automática de `Brand` y `Supplier` durante la sincronización.
+- **CHANGED**: Simplificación de la UI eliminando la visualización de "Costo" y "Etiquetas" (Tags) de la grilla principal (`StockView`) y panel de configuración (`SettingsView`).
+
+## [0.4.3] - Purgado y Restauración de Stock
+- **ADDED**: Botón "Vaciar Catálogo" en `StockView` para purgar completamente la base de datos de productos locales en caso de que ya no se utilice.
+- **ADDED**: Botón "Restaurar desde WC" en `StockView` para sobrescribir el inventario local desactualizado, tomando como fuente de verdad absoluta los valores actuales de WooCommerce.
+- **FIXED**: Bug en la sincronización donde los productos recién creados inicializaban su stock local en 0 y sobrescribían las existencias reales de WooCommerce en el subsecuente "Push" de actualización.
+
 ## [0.4.2] - Light & Dark Mode Toggle
 - **ADDED**: Funcionalidad nativa de cambio de tema Claro/Oscuro desde el header en `MainLayout`.
 - **ADDED**: Detección del tema preferido del sistema operativo (Light/Dark mode) a través de un script embebido.

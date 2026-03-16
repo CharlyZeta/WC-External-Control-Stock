@@ -33,8 +33,6 @@ public class SettingsView extends VerticalLayout {
         private final Checkbox showGtin = new Checkbox("Mostrar GTIN");
         private final Checkbox showCategory = new Checkbox("Mostrar Categoría");
         private final Checkbox showPrice = new Checkbox("Mostrar Precio");
-        private final Checkbox showCost = new Checkbox("Mostrar Costo");
-        private final Checkbox showTags = new Checkbox("Mostrar Etiquetas (Tags)");
         private final Checkbox showBrand = new Checkbox("Mostrar Marca");
         private final Checkbox showSupplier = new Checkbox("Mostrar Proveedor");
 
@@ -82,7 +80,7 @@ public class SettingsView extends VerticalLayout {
                 columnsSizes.setAlignItems(Alignment.BASELINE);
 
                 add(new H2("Visibilidad de Columnas"));
-                add(showGtin, showCategory, showPrice, showCost, showTags, showBrand, showSupplier);
+                add(showGtin, showCategory, showPrice, showBrand, showSupplier);
 
                 add(new Hr());
                 add(new H2("Dimensión de Elementos"));
@@ -131,8 +129,6 @@ public class SettingsView extends VerticalLayout {
                 showGtin.setValue(currentSettings.isShowGtin());
                 showCategory.setValue(currentSettings.isShowCategory());
                 showPrice.setValue(currentSettings.isShowPrice());
-                showCost.setValue(currentSettings.isShowCost());
-                showTags.setValue(currentSettings.isShowTags());
                 showBrand.setValue(currentSettings.isShowBrand());
                 showSupplier.setValue(currentSettings.isShowSupplier());
 
@@ -155,8 +151,6 @@ public class SettingsView extends VerticalLayout {
                 currentSettings.setShowGtin(showGtin.getValue());
                 currentSettings.setShowCategory(showCategory.getValue());
                 currentSettings.setShowPrice(showPrice.getValue());
-                currentSettings.setShowCost(showCost.getValue());
-                currentSettings.setShowTags(showTags.getValue());
                 currentSettings.setShowBrand(showBrand.getValue());
                 currentSettings.setShowSupplier(showSupplier.getValue());
 

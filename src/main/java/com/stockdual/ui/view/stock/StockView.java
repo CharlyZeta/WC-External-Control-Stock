@@ -138,19 +138,21 @@ public class StockView extends VerticalLayout {
 
         // Image Column (Configured Size)
         grid.addComponentColumn(product -> {
-            Icon icon = VaadinIcon.PICTURE.create();
-            icon.setColor("var(--lumo-tertiary-text-color)");
             int size = currentSettings.getImageSize() != null ? currentSettings.getImageSize() : 50;
-            icon.getStyle().set("width", size + "px").set("height", size + "px");
-            return icon;
+            if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
+                Image image = new Image(product.getImageUrl(), "Product Image");
+                image.getStyle().set("width", size + "px").set("height", size + "px").set("object-fit", "cover").set("border-radius", "4px");
+                return image;
+            } else {
+                Icon icon = VaadinIcon.PICTURE.create();
+                icon.setColor("var(--lumo-tertiary-text-color)");
+                icon.getStyle().set("width", size + "px").set("height", size + "px");
+                return icon;
+            }
         }).setHeader("Img").setAutoWidth(true).setFlexGrow(0);
 
-        // SKU Column (Editable)
-        TextField skuField = new TextField();
-        skuField.setWidthFull();
-        binder.forField(skuField).bind(Product::getSku, Product::setSku);
+        // SKU Column (Read-only)
         grid.addColumn(Product::getSku).setHeader("SKU")
-                .setEditorComponent(skuField)
                 .setAutoWidth(true);
 
         // Name Column (Editable, Sortable, Configurable Width)
@@ -215,6 +217,30 @@ public class StockView extends VerticalLayout {
                 })
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.END);
 
+        com.vaadin.flow.component.HasValue.ValueChangeListener<com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent<IntegerField, Integer>> stockChangeListener = e -> {
+            Product editedProduct = editor.getItem();
+            if (editedProduct != null) {
+                int l = stockLocalField.getValue() != null ? stockLocalField.getValue() : 0;
+                int d = stockDepositoField.getValue() != null ? stockDepositoField.getValue() : 0;
+                int g = stockGalponField.getValue() != null ? stockGalponField.getValue() : 0;
+                int wc = editedProduct.getStockWc() != null ? editedProduct.getStockWc() : 0;
+                boolean mismatch = (l + d + g) != wc;
+                
+                stockLocalField.setInvalid(mismatch);
+                stockDepositoField.setInvalid(mismatch);
+                stockGalponField.setInvalid(mismatch);
+            }
+        };
+
+        stockLocalField.setValueChangeMode(ValueChangeMode.EAGER);
+        stockLocalField.addValueChangeListener(stockChangeListener);
+        
+        stockDepositoField.setValueChangeMode(ValueChangeMode.EAGER);
+        stockDepositoField.addValueChangeListener(stockChangeListener);
+        
+        stockGalponField.setValueChangeMode(ValueChangeMode.EAGER);
+        stockGalponField.addValueChangeListener(stockChangeListener);
+
         // Stock WC (Read-only, reported by WooCommerce)
         grid.addColumn(Product::getStockWc).setHeader("WC")
                 .setAutoWidth(true)
@@ -223,9 +249,6 @@ public class StockView extends VerticalLayout {
         // Dynamic Columns based on Settings
         if (currentSettings.isShowPrice()) {
             grid.addColumn(Product::getPrice).setHeader("Precio").setAutoWidth(true);
-        }
-        if (currentSettings.isShowCost()) {
-            grid.addColumn(Product::getCost).setHeader("Costo").setAutoWidth(true);
         }
 
         // GTIN Column (Editable optionally shown)
@@ -238,16 +261,14 @@ public class StockView extends VerticalLayout {
                     .setAutoWidth(true);
         }
 
-        // Category Column (Editable optionally shown, Sortable)
+        // Category Column (Read-only optionally shown, Sortable)
         if (currentSettings.isShowCategory()) {
-            com.vaadin.flow.component.combobox.ComboBox<Category> categoryField = new com.vaadin.flow.component.combobox.ComboBox<>();
-            categoryField.setWidthFull();
-            categoryField.setItems(categoryRepository.findAll());
-            categoryField.setItemLabelGenerator(Category::getName);
-            binder.forField(categoryField).bind(Product::getCategory, Product::setCategory);
-            grid.addColumn(product -> product.getCategory() != null ? product.getCategory().getName() : "-")
+            grid.addColumn(product -> {
+                    if (product.getCategory() != null) return product.getCategory().getName();
+                    if (product.getWcCategory() != null && !product.getWcCategory().isEmpty()) return product.getWcCategory() + " (WC)";
+                    return "-";
+            })
                     .setHeader("Categoría")
-                    .setEditorComponent(categoryField)
                     .setAutoWidth(true)
                     .setSortable(true);
         }
@@ -259,9 +280,6 @@ public class StockView extends VerticalLayout {
         if (currentSettings.isShowSupplier()) {
             grid.addColumn(product -> product.getSupplier() != null ? product.getSupplier().getName() : "-")
                     .setHeader("Proveedor").setAutoWidth(true);
-        }
-        if (currentSettings.isShowTags()) {
-            grid.addColumn(Product::getTags).setHeader("Tags").setAutoWidth(true);
         }
 
         // Action Buttons
@@ -379,9 +397,61 @@ public class StockView extends VerticalLayout {
             updateList();
         });
 
-        Button syncBtn = new Button("Sincronizar Stock", VaadinIcon.REFRESH.create());
+        Button syncBtn = new Button("Sincronizar", VaadinIcon.REFRESH.create());
         syncBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         syncBtn.addClickListener(e -> syncWooCommerce());
+
+        Button restoreWcBtn = new Button("Restaurar desde WC", VaadinIcon.DOWNLOAD.create());
+        restoreWcBtn.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        restoreWcBtn.addClickListener(e -> {
+            boolean hasProducts = productService.countProducts() > 0;
+            ConfirmDialog dialog = new ConfirmDialog();
+            
+            if (hasProducts) {
+                dialog.setHeader("Restaurar Stock desde WooCommerce");
+                dialog.setText("Esto primero descargará los datos actuales desde WooCommerce y luego sobrescribirá tu stock Local reemplazándolo por esos valores, poniendo en 0 Depósito y Galpón. ¿Deseas continuar?");
+                dialog.setConfirmText("Sobrescribir");
+                dialog.setConfirmButtonTheme("error primary");
+            } else {
+                dialog.setHeader("Descargar Catálogo desde WooCommerce");
+                dialog.setText("El catálogo local está vacío. Esto descargará todos los productos desde WooCommerce inicializando tu inventario con esas cantidades reales. ¿Deseas continuar?");
+                dialog.setConfirmText("Descargar");
+                dialog.setConfirmButtonTheme("primary");
+            }
+            dialog.setCancelable(true);
+            dialog.addConfirmListener(event -> {
+                try {
+                    wcSyncService.syncFromWooCommerce();
+                    int count = productService.overwriteLocalStockWithWc();
+                    updateList();
+                    if (hasProducts) {
+                        Notification.show("Se descargaron los datos y se actualizaron las cantidades de " + count + " productos.", 5000, Notification.Position.MIDDLE);
+                    } else {
+                        Notification.show("El catálogo se descargó exitosamente desde cero.", 5000, Notification.Position.MIDDLE);
+                    }
+                } catch (Exception ex) {
+                    Notification.show("Error al restaurar: " + ex.getMessage(), 7000, Notification.Position.MIDDLE);
+                }
+            });
+            dialog.open();
+        });
+
+        Button purgeBtn = new Button("Vaciar Catálogo", VaadinIcon.TRASH.create());
+        purgeBtn.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        purgeBtn.addClickListener(e -> {
+            ConfirmDialog dialog = new ConfirmDialog();
+            dialog.setHeader("Vaciar Catálogo Completo");
+            dialog.setText("Esto eliminará TODOS los productos de la base de datos local. Al volver a sincronizar, se descargarán de nuevo desde cero. ¿Estás absolutamente seguro?");
+            dialog.setCancelable(true);
+            dialog.setConfirmText("Vaciar");
+            dialog.setConfirmButtonTheme("error primary");
+            dialog.addConfirmListener(event -> {
+                productService.deleteAllProducts();
+                updateList();
+                Notification.show("Catálogo vaciado.");
+            });
+            dialog.open();
+        });
 
         // Current grid item count display
         Span itemCountLabel = new Span();
@@ -389,7 +459,7 @@ public class StockView extends VerticalLayout {
                 .set("color", "var(--lumo-secondary-text-color)");
         itemCountLabel.setId("item-count-label");
 
-        HorizontalLayout actionButtons = new HorizontalLayout(addProductBtn, syncBtn, testDataBtn, itemCountLabel);
+        HorizontalLayout actionButtons = new HorizontalLayout(addProductBtn, syncBtn, restoreWcBtn, purgeBtn, testDataBtn, itemCountLabel);
         actionButtons.setWidthFull();
         actionButtons.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
 
