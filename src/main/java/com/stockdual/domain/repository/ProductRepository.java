@@ -35,11 +35,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @Query("select sum(p.stockTotal) from Product p")
     Long sumTotalStock();
 
-    @Query("select sum(p.stockTotal * p.cost) from Product p")
+    @Query("select sum(cast(p.stockTotal as bigdecimal) * p.cost) from Product p")
     java.math.BigDecimal sumInventoryValue();
 
     @Query("select count(p) from Product p where p.stockTotal != p.stockWc")
     Long countStockAlerts();
+
+    @Query("select count(p) from Product p where p.stockTotal = 0")
+    Long countOutOfStock();
+
+    @Query("select count(p) from Product p where p.stockTotal > 0 and p.stockTotal <= :threshold")
+    Long countCriticalStock(@Param("threshold") int threshold);
 
     java.util.Optional<Product> findBySku(String sku);
 
@@ -52,6 +58,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     @org.springframework.data.jpa.repository.Modifying
     @Query("delete from Product p where p.wcId is null")
     void deleteAllUnlinkedProducts();
+
+    @Query("select distinct p.wcCategory from Product p where p.wcCategory is not null")
+    List<String> findAllWcCategories();
 
     long count();
 }

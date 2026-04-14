@@ -1,77 +1,80 @@
 # 🚀 StockDual
-Sistema híbrido moderno para la gestión de facturación e inventario en múltiples ubicaciones (Local, Depósito y Galpón), integrado de forma bidireccional con WooCommerce. 
-Soluciona el problema de mantener el stock sincronizado entre tiendas físicas y virtuales de forma centralizada. 
-Pensado para pymes con operaciones retail y eCommerce.
+[![Version](https://img.shields.io/badge/Version-0.5.0--beta-blue?style=for-the-badge)](./ChangeLog.txt)
+[![Java](https://img.shields.io/badge/Java%2021-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203.4.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Vaadin](https://img.shields.io/badge/Vaadin%2024.6-00B4F0?style=for-the-badge&logo=vaadin&logoColor=white)](https://vaadin.com/)
+[![License](https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge)](./LICENSE)
 
-## 🎯 Objetivo
-Brindar un control preciso y centralizado del inventario distribuido, optimizando los procesos de auditoría y ajuste de stock mediante una interfaz tipo hoja de cálculo ágil. Su valor principal radica en la sincronización con WooCommerce, evitando quiebres de stock y ventas de productos no disponibles.
+Sistema híbrido avanzado para la gestión integral de inventario y facturación en múltiples ubicaciones (Local, Depósito y Galpón), con sincronización nativa bidireccional para WooCommerce.
 
-## 🧠 Contexto
-Desarrollado como una solución productiva real para unificar la gestión del Punto de Venta (POS) y los depósitos con la tienda online de WooCommerce. Fue pensado para escalar de manera sólida.
+## 🌟 Funcionalidades Principales
 
-## 🛠 Tech Stack
-![Java](https://img.shields.io/badge/Java%2021-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203.4.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL%2016-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![Vaadin](https://img.shields.io/badge/Vaadin%20Flow%2024.6-00B4F0?style=for-the-badge&logo=vaadin&logoColor=white)
-![Hibernate](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white)
-![Flyway](https://img.shields.io/badge/Flyway-CC0200?style=for-the-badge&logo=flyway&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
-![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+### 📊 Dashboard Inteligente (KPIs)
+Visualización en tiempo real del estado de salud del negocio.
+*   **Métricas Clave**: Total de productos, stock físico total, conteo de faltantes y stock crítico.
+*   **Alertas Configurables**: Define tu propio umbral de "Stock Crítico" desde los ajustes de usuario.
+*   **Distribución Geográfica**: Gráficos de barras que muestran la concentración de mercadería por ubicación.
 
-## 🏗 Arquitectura
-Arquitectura limpia en capas (Layered architecture):
-- **Domain**: Entidades JPA puras (`@Entity`, `Product`, `Category`).
-- **Repository**: Interfaces `JpaRepository`. Se utilizan cargas profundas dirigidas (`@EntityGraph`) para evitar problemas tipo N+1.
-- **Service**: Encapsula las reglas de negocio y maneja los límites de transacción (`@Transactional`).
-- **Client**: Integraciones REST con capas externas (como el cliente de la API de WooCommerce).
-- **UI**: Vistas y componentes completamente en Java apoyados en el framework Vaadin, enlazando datos a través de `Binder<T>`.
+> **[ CAPTURA SIMULADA: DASHBOARD ]**  
+> ![Dashboard Screenshot](https://raw.githubusercontent.com/CharlyZeta/StockDual/main/docs/screenshots/dashboard_mock.png)  
+> *Interfaz limpia con tarjetas de métricas en degradados azules, verdes y naranjas.*
 
-## 🔐 Seguridad
-- Spring Security para el manejo de sesiones estándar y blindaje de las rutas y vistas proporcionadas por Vaadin.
-- Las credenciales sensibles (API Keys de WooCommerce) y accesos de BD se abstraen en configuraciones y variables de entorno del servidor.
+### 📋 Control de Stock "Excel-Like"
+Grilla de alta densidad optimizada para auditorías rápidas.
+*   **Edición Inline**: Modifica stocks directamente en la celda sin ventanas emergentes.
+*   **Filtros Unificados**: Busca por nombre, SKU o categorías (combinando categorías locales y de WooCommerce).
+*   **Detección de Discrepancias**: Resaltado visual automático (en rojo suave) de productos cuyo stock local no coincide con el reportado en la tienda online.
 
-## 🧪 Testing
-Este proyecto contiene pruebas de componentes específicos:
-- Pruebas unitarias de configuración de BD (ej. `DbTest.java`).
-- Pruebas de integración para las API (ej. `WcTest.java`).
+> **[ CAPTURA SIMULADA: CONTROL DE STOCK ]**  
+> ![Stock Grid Screenshot](https://raw.githubusercontent.com/CharlyZeta/StockDual/main/docs/screenshots/stock_grid_mock.png)  
+> *Grilla compacta con columnas fijas y resaltado de errores de sincronización.*
 
-**Cómo ejecutarlos:**
-```bash
-./mvnw test
-```
+### 🧮 Formador de Precios (Planilla de Costos)
+Herramienta administrativa para la determinación precisa de precios de venta.
+*   **Cálculo en Cascada**: Aplica descuentos sucesivos, gastos en porcentaje, IVA, gastos fijos y márgenes de ganancia.
+*   **Reactividad Total**: Los resultados de "Precio Final" y "Precio Lista" se actualizan instantáneamente al presionar Enter.
+*   **Persistencia por Proveedor**: Almacena las reglas de cálculo incluso para proveedores sin productos activos.
 
-## 🐳 Ejecución Local
-1. Clonar el repositorio
-```bash
-git clone https://github.com/CharlyZeta/StockDual.git
-```
+> **[ CAPTURA SIMULADA: FORMADOR DE PRECIOS ]**  
+> ![Price Formulator Screenshot](https://raw.githubusercontent.com/CharlyZeta/StockDual/main/docs/screenshots/price_formulator_mock.png)  
+> *Planilla técnica con valores centrados y columnas de resultados congeladas a la derecha.*
 
-2. Configuración y levante de servicios:
-Levantar la base de datos (PostgreSQL 16 mapeado al puerto 5433).
-```bash
-docker-compose up -d
-```
+## 🛠 Tech Stack & Arquitectura
+*   **Backend**: Java 21 + Spring Boot 3.4.
+*   **Frontend**: Vaadin Flow 24 (React-based components) + Vite.
+*   **Base de Datos**: PostgreSQL 16 con control de versiones vía **Flyway**.
+*   **Seguridad**: Spring Security con autenticación robusta y control de acceso por roles.
+*   **Integración**: Cliente REST reactivo para la API de WooCommerce.
 
-3. Ejecutar la app:
-```bash
-./mvnw spring-boot:run
-```
+## 🧪 Calidad y Testing
+El proyecto sigue una arquitectura orientada a **TDD (Test Driven Development)** para sus capas de lógica financiera.
+*   **Validación de Cálculos**: Tests unitarios que aseguran la precisión de la cascada de costos hasta el segundo decimal.
+*   **Ejecución**: 
+    ```bash
+    ./mvnw test
+    ```
+
+## 🔧 Ejecución Local
+1.  **Requisitos**: Docker y Java 21.
+2.  **Base de Datos**: `docker-compose up -d`.
+3.  **Ejecución**: `./mvnw spring-boot:run`.
+4.  **Limpieza de Cache**: En caso de problemas con la UI, usar el script personalizado:
+    ```powershell
+    .\dev-refresh.ps1
+    ```
 
 ## 🚀 Despliegue
 - `Dockerfile` incluido para empaquetado de proyecto final estandarizado.
 - Preparado para despliegue en contenedores apoyado por migraciones automáticas nativas vía `Flyway`.
 
 ## 📌 Estado del Proyecto
-- En mejora continua (Catálogo manual estable, integración de stock base operativa).
+- **En mejora continua** (Catálogo manual estable, integración de stock base operativa, formador de precios funcional).
 
 ## 🛣 Roadmap
 - Implementar el módulo completo de reportes.
 - Agregar Webhooks para recibir actualizaciones de ventas/ordenes que modifican inventario de WooCommerce de manera directa y en tiempo real.
-- Agregar KPIs en la parte superior del tablero: Total de artículos, valor del inventario e items bajos en stock.
 
 ## 👨‍💻 Autor
-Gerardo Maidana
-Backend Developer | Java & Spring Boot
-LinkedIn https://linkedin.com/in/gerardomaidana
-GitHub https://github.com/CharlyZeta/
+**Gerardo Maidana**  
+Backend Developer | Java & Spring Boot  
+[LinkedIn](https://linkedin.com/in/gerardomaidana) | [GitHub](https://github.com/CharlyZeta/)

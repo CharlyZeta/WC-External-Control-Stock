@@ -344,80 +344,273 @@ vaadin-login-form::part(form) {
 }
 
 /* ============================================
-   Dashboard Stat Cards
+   Dashboard — Modern Redesign
    ============================================ */
 
-.stats-row {
-    gap: 16px;
-    flex-wrap: wrap;
+/* Header */
+.dashboard-greeting {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--sd-text-primary);
+    letter-spacing: -0.02em;
 }
 
-.stat-card {
+.dashboard-date {
+    font-size: 0.85rem;
+    color: var(--sd-text-muted);
+    margin-top: 4px;
+    display: block;
+    text-transform: capitalize;
+}
+
+.dashboard-subtitle {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--sd-text-muted);
+    background: var(--sd-bg-elevated);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--sd-border);
+}
+
+/* KPI Row */
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.kpi-card {
     background: var(--sd-bg-surface);
     border: 1px solid var(--sd-border);
-    border-radius: 12px;
-    padding: 20px;
-    flex: 1;
-    min-width: 180px;
+    border-radius: 16px;
+    padding: 24px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 16px;
-    transition: border-color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.stat-card:hover {
+.kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     border-color: rgba(255, 255, 255, 0.15);
 }
 
-.stat-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+/* KPI Color variants */
+.kpi-blue::before { background: linear-gradient(90deg, #135bec, #4d8ef7); }
+.kpi-blue .kpi-icon-wrap { background: rgba(19, 91, 236, 0.15); color: #4d8ef7; }
+
+.kpi-green::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.kpi-green .kpi-icon-wrap { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+.kpi-purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.kpi-purple .kpi-icon-wrap { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+
+.kpi-orange::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.kpi-orange .kpi-icon-wrap { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+
+.kpi-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: transform 0.2s ease;
 }
 
-.stat-card-blue .stat-icon {
-    background: rgba(19, 91, 236, 0.12);
-    color: #4d8ef7;
+.kpi-card:hover .kpi-icon-wrap {
+    transform: scale(1.05);
 }
 
-.stat-card-green .stat-icon {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
+.kpi-icon-wrap vaadin-icon {
+    width: 26px !important;
+    height: 26px !important;
 }
 
-.stat-card-orange .stat-icon {
-    background: rgba(245, 158, 11, 0.12);
-    color: #f59e0b;
-}
-
-.stat-card-gray .stat-icon {
-    background: rgba(107, 127, 163, 0.12);
-    color: #6b7fa3;
-}
-
-.stat-text {
+.kpi-text-wrap {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    flex: 1;
 }
 
-.stat-value {
-    font-size: 1.4rem;
-    font-weight: 700;
+.kpi-value {
+    font-size: 1.5rem;
+    font-weight: 800;
     color: var(--sd-text-primary);
+    letter-spacing: -0.03em;
     line-height: 1;
 }
 
-.stat-label {
+.kpi-label {
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
+    color: var(--sd-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* Section titles */
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--sd-text-primary);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.01em;
+}
+
+.stock-section {
+    margin-bottom: 32px;
+}
+
+.secondary-section {
+    margin-bottom: 32px;
+}
+
+/* Stock Location Cards */
+.stock-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.location-card {
+    background: var(--sd-bg-surface);
+    border: 1px solid var(--sd-border);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.location-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.loc-name {
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--sd-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.loc-stock {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--sd-text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.loc-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: var(--sd-bg-elevated);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.loc-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.fill-blue { background: linear-gradient(90deg, #135bec, #4d8ef7); }
+.fill-green { background: linear-gradient(90deg, #10b981, #34d399); }
+.fill-purple { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+/* Mini Cards (secondary metrics) */
+.secondary-cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.mini-card {
+    background: var(--sd-bg-surface);
+    border: 1px solid var(--sd-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s ease;
+    text-align: center;
+}
+
+.mini-card:hover {
+    transform: translateY(-2px);
+}
+
+.mini-icon {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+.mini-blue .mini-icon { color: #4d8ef7; }
+.mini-green .mini-icon { color: #10b981; }
+.mini-purple .mini-icon { color: #a78bfa; }
+
+.mini-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--sd-text-primary);
+    letter-spacing: -0.02em;
+}
+
+.mini-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--sd-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    .kpi-card {
+        padding: 16px;
+    }
+    .kpi-icon-wrap {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+    }
+    .kpi-value {
+        font-size: 1.2rem;
+    }
+    .stock-cards-row {
+        grid-template-columns: 1fr;
+    }
+    .secondary-cards-row {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
 /* ============================================
@@ -462,13 +655,39 @@ vaadin-select {
 
 /* Resalta toda la fila cuando hay discrepancia */
 vaadin-grid::part(body-cell stock-mismatch-row) {
-    background-color: rgba(239, 68, 68, 0.15) !important; /* Soft red background for the entire row */
-    color: #ffdce0 !important;
+    background-color: rgba(239, 68, 68, 0.1) !important; /* Rojo muy suave para la fila completa */
 }
 
-/* Fuerza el resaltado en la celda individual con "font-weight" agresivo y fondo más denso */
+/* Fuerza el resaltado en la celda individual con fondo más denso */
 vaadin-grid::part(body-cell stock-mismatch-cell) {
-    background-color: rgba(239, 68, 68, 0.4) !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
+    background-color: rgba(239, 68, 68, 0.35) !important;
+    font-weight: 700 !important;
+}
+
+/* ============================================
+   Price Formulator — Excel Grouping Styles
+   ============================================ */
+
+/* Línea vertical gruesa para separar grupos de columnas */
+vaadin-grid::part(body-cell group-separator-column),
+vaadin-grid::part(header-cell group-separator-column) {
+    border-right: 2px solid var(--lumo-contrast-20pct) !important;
+}
+
+/* Estilo destacado para Precio Final y Lista */
+vaadin-grid::part(body-cell final-price-cell) {
+    background-color: var(--lumo-primary-color-10pct) !important;
+    font-weight: 700;
+    color: var(--lumo-primary-text-color);
+}
+
+vaadin-grid::part(body-cell list-price-cell) {
+    background-color: var(--lumo-success-color-10pct) !important;
+    font-weight: 800;
+    color: var(--lumo-success-text-color);
+}
+
+/* Alineación de cabeceras de grupos */
+vaadin-grid::part(header-cell group-header) {
+    text-align: center;
 }

@@ -31,10 +31,20 @@ public class WooCommerceSyncService {
     private final BrandRepository brandRepository;
     private final SupplierRepository supplierRepository;
 
-    public void syncFromWooCommerce() {
+    /**
+     * Resultado de una sincronización desde WooCommerce.
+     * Contiene estadísticas y lista de productos marcados para eliminación.
+     */
+    public record SyncResult(int created, int updated, int toDelete, List<String> skusToDelete) {
+        public boolean hasItemsToDelete() {
+            return toDelete > 0;
+        }
+    }
+
+    public SyncResult syncFromWooCommerce() {
         UserSettings settings = getSettings();
         if (!validateSettings(settings))
-            return;
+            return new SyncResult(0, 0, 0, List.of());
 
         try {
             log.info("Starting sync FROM WooCommerce...");
@@ -53,10 +63,10 @@ public class WooCommerceSyncService {
                 if (wcProduct.getSku() == null || wcProduct.getSku().isEmpty()) {
                     continue; // Skip products without SKU
                 }
-                
+
                 wcSkus.add(wcProduct.getSku());
 
-                log.info("Processing {}, manageStock={}, stockQuantity={}", 
+                log.info("Processing {}, manageStock={}, stockQuantity={}",
                         wcProduct.getSku(), wcProduct.getManageStock(), wcProduct.getStockQuantity());
 
                 Optional<Product> productOpt = productRepository.findBySku(wcProduct.getSku());
@@ -102,7 +112,7 @@ public class WooCommerceSyncService {
                     newProduct.setStockWc(wcStock);
                     newProduct.setStockLocal(wcStock);
                     newProduct.setStockTotal(wcStock);
-                    
+
                     if (wcProduct.getPrice() != null && !wcProduct.getPrice().isEmpty()) {
                         try {
                             newProduct.setPrice(new java.math.BigDecimal(wcProduct.getPrice()));
@@ -120,30 +130,52 @@ public class WooCommerceSyncService {
                     if (wcProduct.getCategories() != null && !wcProduct.getCategories().isEmpty()) {
                         newProduct.setWcCategory(wcProduct.getCategories().get(0).getName());
                     }
-                    
+
                     updateProductAttributes(newProduct, wcProduct);
-                    
+
                     productRepository.save(newProduct);
                     createdCount++;
                 }
             }
-            
-            // Delete local products that no longer exist in WooCommerce (based on SKU)
+
+            // Identify local products that no longer exist in WooCommerce (based on SKU)
+            // Do NOT delete automatically — return list for user confirmation
             List<Product> allLocalProducts = productRepository.findAll();
-            int deletedCount = 0;
+            List<String> skusToDelete = new java.util.ArrayList<>();
             for (Product localProduct : allLocalProducts) {
                 if (localProduct.getSku() != null && !localProduct.getSku().isEmpty() && !wcSkus.contains(localProduct.getSku())) {
-                    productRepository.delete(localProduct);
-                    deletedCount++;
-                    log.info("Deleted local product with SKU {} as it no longer exists in WooCommerce.", localProduct.getSku());
+                    skusToDelete.add(localProduct.getSku());
+                    log.info("Local product with SKU {} no longer exists in WooCommerce.", localProduct.getSku());
                 }
             }
 
-            log.info("Finished sync FROM WooCommerce. Created: {}, Updated: {}, Deleted: {}.", createdCount, updatedCount, deletedCount);
+            log.info("Finished sync FROM WooCommerce. Created: {}, Updated: {}, To Delete: {}.", createdCount, updatedCount, skusToDelete.size());
+            return new SyncResult(createdCount, updatedCount, skusToDelete.size(), skusToDelete);
         } catch (Exception e) {
             log.error("Error during sync FROM WooCommerce: {}", e.getMessage(), e);
             throw new RuntimeException("Sync from WooCommerce failed", e);
         }
+    }
+
+    /**
+     * Elimina los productos locales que ya no existen en WooCommerce.
+     * Debe llamarse explícitamente después de que el usuario confirme.
+     */
+    @Transactional
+    public int deleteProductsNotInWooCommerce(List<String> skusToDelete) {
+        if (skusToDelete == null || skusToDelete.isEmpty()) {
+            return 0;
+        }
+        int deletedCount = 0;
+        for (String sku : skusToDelete) {
+            var productOpt = productRepository.findBySku(sku);
+            if (productOpt.isPresent()) {
+                productRepository.delete(productOpt.get());
+                deletedCount++;
+            }
+        }
+        log.info("Deleted {} local products that no longer exist in WooCommerce.", deletedCount);
+        return deletedCount;
     }
 
     public void syncToWooCommerce() {

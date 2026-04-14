@@ -56,6 +56,10 @@ public class UserSettings {
     @Builder.Default
     private boolean showSupplier = false;
 
+    @Column(name = "critical_stock_threshold")
+    @Builder.Default
+    private Integer criticalStockThreshold = 5;
+
     @Column(name = "wc_api_url", length = 255)
     private String wcApiUrl;
 

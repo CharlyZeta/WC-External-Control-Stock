@@ -6,15 +6,15 @@ services:
     container_name: stockdual-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: stockdual
-      POSTGRES_USER: stockdual
-      POSTGRES_PASSWORD: stockdual_dev_2024
+      POSTGRES_DB: ${POSTGRES_DB:-stockdual}
+      POSTGRES_USER: ${POSTGRES_USER:-stockdual}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stockdual_dev_2024}
     ports:
-      - "5433:5432"
+      - "${DB_PORT:-5433}:5432"
     volumes:
       - stockdual_pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U stockdual" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stockdual}" ]
       interval: 10s
       timeout: 5s
       retries: 5

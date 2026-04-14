@@ -41,6 +41,8 @@ public class SettingsView extends VerticalLayout {
                         "Tamaño de Imagen (px)");
         private final com.vaadin.flow.component.textfield.TextField nameColumnWidthField = new com.vaadin.flow.component.textfield.TextField(
                         "Ancho de Columna 'Nombre'");
+        private final com.vaadin.flow.component.textfield.IntegerField criticalStockThresholdField = new com.vaadin.flow.component.textfield.IntegerField(
+                        "Umbral de Stock Crítico");
 
         // WooCommerce Configurations
         private final com.vaadin.flow.component.textfield.TextField wcApiUrl = new com.vaadin.flow.component.textfield.TextField(
@@ -71,6 +73,9 @@ public class SettingsView extends VerticalLayout {
 
                 nameColumnWidthField.setPlaceholder("Ej: 300px o 25rem");
 
+                criticalStockThresholdField.setMin(0);
+                criticalStockThresholdField.setHelperText("Productos con stock menor o igual a este valor se marcarán como críticos.");
+
                 Button saveButton = new Button("Guardar Preferencias");
                 saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
                 saveButton.addClickListener(e -> saveSettings());
@@ -85,6 +90,11 @@ public class SettingsView extends VerticalLayout {
                 add(new Hr());
                 add(new H2("Dimensión de Elementos"));
                 add(columnsSizes);
+
+                add(new Hr());
+                add(new H2("Configuraciones de Inventario"));
+                add(new Span("Define parámetros para el cálculo de alertas y estados de stock."));
+                add(criticalStockThresholdField);
 
                 // WC Config layout
                 add(new Hr());
@@ -123,6 +133,7 @@ public class SettingsView extends VerticalLayout {
                 currentSettings = settingsRepository.findByUserId("admin").orElseGet(() -> {
                         UserSettings defaultSettings = new UserSettings();
                         defaultSettings.setUserId("admin");
+                        defaultSettings.setCriticalStockThreshold(5);
                         return defaultSettings;
                 });
 
@@ -136,6 +147,10 @@ public class SettingsView extends VerticalLayout {
                 nameColumnWidthField.setValue(
                                 currentSettings.getNameColumnWidth() != null ? currentSettings.getNameColumnWidth()
                                                 : "300px");
+                criticalStockThresholdField.setValue(
+                                currentSettings.getCriticalStockThreshold() != null
+                                                ? currentSettings.getCriticalStockThreshold()
+                                                : 5);
 
                 wcApiUrl.setValue(currentSettings.getWcApiUrl() != null ? currentSettings.getWcApiUrl() : "");
                 wcConsumerKey.setValue(
@@ -159,6 +174,9 @@ public class SettingsView extends VerticalLayout {
                 }
                 if (nameColumnWidthField.getValue() != null && !nameColumnWidthField.getValue().trim().isEmpty()) {
                         currentSettings.setNameColumnWidth(nameColumnWidthField.getValue());
+                }
+                if (criticalStockThresholdField.getValue() != null) {
+                        currentSettings.setCriticalStockThreshold(criticalStockThresholdField.getValue());
                 }
 
                 currentSettings.setWcApiUrl(wcApiUrl.getValue());

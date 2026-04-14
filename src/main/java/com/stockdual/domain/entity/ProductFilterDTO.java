@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProductFilterDTO {
     private String searchText; // Will search in Name, SKU, and Tags
-    private Category category;
+    private String category;
     private Brand brand;
     private Supplier supplier;
     private String stockStatus; // "Con Stock", "Sin Stock"

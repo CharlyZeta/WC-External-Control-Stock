@@ -22,8 +22,10 @@ public class ProductSpecification {
                 predicates.add(criteriaBuilder.or(namePredicate, skuPredicate, tagsPredicate));
             }
 
-            if (filter.getCategory() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("category"), filter.getCategory()));
+            if (filter.getCategory() != null && !filter.getCategory().isEmpty()) {
+                Predicate localCategoryPredicate = criteriaBuilder.equal(root.get("category").get("name"), filter.getCategory());
+                Predicate wcCategoryPredicate = criteriaBuilder.equal(root.get("wcCategory"), filter.getCategory());
+                predicates.add(criteriaBuilder.or(localCategoryPredicate, wcCategoryPredicate));
             }
 
             if (filter.getBrand() != null) {
@@ -50,9 +52,9 @@ public class ProductSpecification {
                 predicates.add(criteriaBuilder.greaterThan(root.get("stockGalpon"), 0));
             }
 
-            if ("Menor a Mayor".equals(filter.getPriceOrder())) {
+            if ("Menor Precio".equals(filter.getPriceOrder())) {
                 query.orderBy(criteriaBuilder.asc(root.get("price")));
-            } else if ("Mayor a Menor".equals(filter.getPriceOrder())) {
+            } else if ("Mayor Precio".equals(filter.getPriceOrder())) {
                 query.orderBy(criteriaBuilder.desc(root.get("price")));
             }
 

@@ -1,9 +1,11 @@
 package com.stockdual.ui.layout;
 
+import com.stockdual.config.AppVersionProvider;
 import com.stockdual.ui.view.dashboard.DashboardView;
 import com.stockdual.ui.view.pos.PosView;
 import com.stockdual.ui.view.purchase.PurchaseView;
 import com.stockdual.ui.view.settings.SettingsView;
+import com.stockdual.ui.view.stock.PriceFormulatorView;
 import com.stockdual.ui.view.stock.StockView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -26,9 +28,11 @@ import jakarta.annotation.security.PermitAll;
 public class MainLayout extends AppLayout {
 
     private final AuthenticationContext authContext;
+    private final AppVersionProvider versionProvider;
 
-    public MainLayout(AuthenticationContext authContext) {
+    public MainLayout(AuthenticationContext authContext, AppVersionProvider versionProvider) {
         this.authContext = authContext;
+        this.versionProvider = versionProvider;
         setPrimarySection(Section.DRAWER);
         addClassName("main-layout");
 
@@ -39,8 +43,6 @@ public class MainLayout extends AppLayout {
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
-        // Apply theme based on localStorage or OS preference (safe to call here, UI is
-        // attached)
         getUI().ifPresent(ui -> ui.getPage().executeJs(
                 "const theme = localStorage.getItem('theme');" +
                         "if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {"
@@ -59,13 +61,15 @@ public class MainLayout extends AppLayout {
         H1 appName = new H1("StockDual");
         appName.addClassNames("app-name");
 
-        // Logout button
         Button logoutBtn = new Button("Salir", VaadinIcon.SIGN_OUT.create(), e -> authContext.logout());
         logoutBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
         logoutBtn.addClassName("logout-btn");
 
-        // Username display
-        String username = authContext.getPrincipalName().orElse("Usuario");
+        String username = "Usuario";
+        try {
+            username = authContext.getPrincipalName().orElse("Usuario");
+        } catch (Exception e) {}
+        
         Span userSpan = new Span(username);
         userSpan.addClassName("user-display");
 
@@ -84,7 +88,6 @@ public class MainLayout extends AppLayout {
                             "localStorage.setItem('theme', newTheme);");
         });
         themeToggle.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
-        themeToggle.setTooltipText("Alternar modo claro/oscuro");
         themeToggle.addClassName("theme-toggle-btn");
 
         HorizontalLayout rightSection = new HorizontalLayout(themeToggle, userSpan, logoutBtn);
@@ -101,23 +104,21 @@ public class MainLayout extends AppLayout {
     }
 
     private void createDrawer() {
-        // Logo section
         Div logoSection = new Div();
         logoSection.addClassName("drawer-logo-section");
         H2 logoText = new H2("StockDual");
         logoText.addClassName("drawer-logo");
         logoSection.add(logoText);
 
-        // Navigation
         SideNav nav = new SideNav();
         nav.addClassName("side-nav");
 
         nav.addItem(new SideNavItem("Dashboard", DashboardView.class, VaadinIcon.DASHBOARD.create()));
         nav.addItem(new SideNavItem("Control de Stock", StockView.class, VaadinIcon.STORAGE.create()));
+        nav.addItem(new SideNavItem("Formador Precios", PriceFormulatorView.class, VaadinIcon.CALC_BOOK.create()));
         nav.addItem(new SideNavItem("Compras", PurchaseView.class, VaadinIcon.CART.create()));
         nav.addItem(new SideNavItem("Terminal POS", PosView.class, VaadinIcon.SHOP.create()));
 
-        // Separator
         Hr separator = new Hr();
         separator.addClassName("nav-separator");
 
@@ -128,14 +129,13 @@ public class MainLayout extends AppLayout {
         Scroller scroller = new Scroller(new Div(nav, separator, settingsNav));
         scroller.addClassName("drawer-scroller");
 
-        // Footer version section
         Div footerSection = new Div();
         footerSection.addClassName("drawer-footer");
         footerSection.getStyle().set("margin-top", "auto");
         footerSection.getStyle().set("padding", "var(--lumo-space-m)");
         footerSection.getStyle().set("text-align", "center");
 
-        Paragraph version = new Paragraph("v0.4.2");
+        Paragraph version = new Paragraph("v" + versionProvider.getVersion());
         version.addClassName("drawer-version");
         version.getStyle().set("color", "var(--lumo-tertiary-text-color)");
         version.getStyle().set("font-size", "var(--lumo-font-size-xs)");

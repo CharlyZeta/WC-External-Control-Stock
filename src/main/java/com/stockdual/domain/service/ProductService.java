@@ -61,6 +61,10 @@ public class ProductService {
         return productRepository.count();
     }
 
+    public List<String> findAllWcCategories() {
+        return productRepository.findAllWcCategories();
+    }
+
     public void deleteProduct(Product product) {
         productRepository.delete(product);
     }
@@ -98,15 +102,33 @@ public class ProductService {
         return updatedCount;
     }
 
+    @Transactional
     public void saveProduct(Product product) {
         if (product == null) {
             System.err.println("Product is null. Are you sure you have connected your form to the application?");
             return;
         }
-        // Centralize business logic: Calculate total stock before saving
-        product.setStockTotal((product.getStockLocal() != null ? product.getStockLocal() : 0) +
+
+        // Calculate total stock
+        int totalStock = (product.getStockLocal() != null ? product.getStockLocal() : 0) +
                 (product.getStockDeposito() != null ? product.getStockDeposito() : 0) +
-                (product.getStockGalpon() != null ? product.getStockGalpon() : 0));
+                (product.getStockGalpon() != null ? product.getStockGalpon() : 0);
+
+        // If the product already exists, reload from DB and only update stock fields
+        if (product.getId() != null) {
+            Product managed = productRepository.findById(product.getId()).orElse(null);
+            if (managed != null) {
+                managed.setStockLocal(product.getStockLocal());
+                managed.setStockDeposito(product.getStockDeposito());
+                managed.setStockGalpon(product.getStockGalpon());
+                managed.setStockTotal(totalStock);
+                productRepository.save(managed);
+                return;
+            }
+        }
+
+        // New product: save directly
+        product.setStockTotal(totalStock);
         productRepository.save(product);
     }
 

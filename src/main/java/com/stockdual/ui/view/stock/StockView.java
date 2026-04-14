@@ -26,14 +26,12 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -41,11 +39,9 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
-import com.stockdual.domain.repository.ProductSpecification;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Route(value = "stock", layout = MainLayout.class)
 @PageTitle("Control de Stock — StockDual")
@@ -63,7 +59,7 @@ public class StockView extends VerticalLayout {
     private final WooCommerceSyncService wcSyncService;
     private UserSettings currentSettings;
 
-    private final ComboBox<Category> categoryFilter = new ComboBox<>("Categoría");
+    private final ComboBox<String> categoryFilter = new ComboBox<>("Categoría");
     private final ComboBox<Brand> brandFilter = new ComboBox<>("Marca");
     private final ComboBox<Supplier> supplierFilter = new ComboBox<>("Proveedor");
     private final Select<String> stockStatusFilter = new Select<>();
@@ -71,7 +67,8 @@ public class StockView extends VerticalLayout {
 
     private final VerticalLayout toolbar = new VerticalLayout();
 
-    public StockView(ProductService productService, CategoryRepository categoryRepository,
+    public StockView(ProductService productService,
+            CategoryRepository categoryRepository,
             BrandRepository brandRepository, SupplierRepository supplierRepository,
             UserSettingsRepository userSettingsRepository, WooCommerceSyncService wcSyncService) {
         this.productService = productService;
@@ -155,12 +152,8 @@ public class StockView extends VerticalLayout {
         grid.addColumn(Product::getSku).setHeader("SKU")
                 .setAutoWidth(true);
 
-        // Name Column (Editable, Sortable, Configurable Width)
-        TextField nameField = new TextField();
-        nameField.setWidthFull();
-        binder.forField(nameField).asRequired("Nombre es requerido").bind(Product::getName, Product::setName);
+        // Name Column (Read-only, Sortable, Configurable Width)
         grid.addColumn(Product::getName).setHeader("Nombre")
-                .setEditorComponent(nameField)
                 .setWidth(currentSettings.getNameColumnWidth() != null ? currentSettings.getNameColumnWidth() : "300px")
                 .setFlexGrow(1)
                 .setSortable(true)
@@ -251,13 +244,9 @@ public class StockView extends VerticalLayout {
             grid.addColumn(Product::getPrice).setHeader("Precio").setAutoWidth(true);
         }
 
-        // GTIN Column (Editable optionally shown)
+        // GTIN Column (Read-only, optionally shown)
         if (currentSettings.isShowGtin()) {
-            TextField gtinField = new TextField();
-            gtinField.setWidthFull();
-            binder.forField(gtinField).bind(Product::getGtin, Product::setGtin);
             grid.addColumn(Product::getGtin).setHeader("GTIN")
-                    .setEditorComponent(gtinField)
                     .setAutoWidth(true);
         }
 
@@ -305,7 +294,7 @@ public class StockView extends VerticalLayout {
         }).setHeader("Acciones").setAutoWidth(true).setFlexGrow(0)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.END);
 
-        // Grid Events
+        // Grid Events — open inline editor on double click
         grid.addItemDoubleClickListener(e -> {
             editor.editItem(e.getItem());
             Component editorComponent = e.getColumn().getEditorComponent();
@@ -315,13 +304,11 @@ public class StockView extends VerticalLayout {
         });
 
         editor.addSaveListener(e -> {
-            productService.saveProduct(e.getItem());
-            updateList();
-        });
-
-        editor.addCloseListener(e -> {
-            if (e.getItem() != null) {
-                // handle cancel
+            try {
+                productService.saveProduct(e.getItem());
+                updateList();
+            } catch (Exception ex) {
+                Notification.show("Error al guardar: " + ex.getMessage(), 5000, Notification.Position.MIDDLE);
             }
         });
 
@@ -349,49 +336,57 @@ public class StockView extends VerticalLayout {
         searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.addValueChangeListener(e -> updateList());
+        searchField.setMinWidth("200px");
 
         // --- Filters ---
         categoryFilter.setPlaceholder("Categoría");
-        categoryFilter.setItems(categoryRepository.findAll());
-        categoryFilter.setItemLabelGenerator(Category::getName);
+        refreshCategories();
         categoryFilter.setClearButtonVisible(true);
         categoryFilter.addValueChangeListener(e -> updateList());
+        categoryFilter.setMinWidth("150px");
 
         brandFilter.setPlaceholder("Marca");
         brandFilter.setItems(brandRepository.findAll());
         brandFilter.setItemLabelGenerator(Brand::getName);
         brandFilter.setClearButtonVisible(true);
         brandFilter.addValueChangeListener(e -> updateList());
+        brandFilter.setMinWidth("150px");
 
         supplierFilter.setPlaceholder("Proveedor");
         supplierFilter.setItems(supplierRepository.findAll());
         supplierFilter.setItemLabelGenerator(Supplier::getName);
         supplierFilter.setClearButtonVisible(true);
         supplierFilter.addValueChangeListener(e -> updateList());
+        supplierFilter.setMinWidth("150px");
 
+        stockStatusFilter.setLabel("Stock");
         stockStatusFilter.setItems("Todos", "Con Stock", "Sin Stock");
         stockStatusFilter.setValue("Todos");
         stockStatusFilter.addValueChangeListener(e -> updateList());
+        stockStatusFilter.setWidth("120px");
 
+        priceOrderFilter.setLabel("Precio");
         priceOrderFilter.setItems("Cualquiera", "Mayor Precio", "Menor Precio");
         priceOrderFilter.setValue("Cualquiera");
         priceOrderFilter.addValueChangeListener(e -> updateList());
+        priceOrderFilter.setWidth("140px");
 
-        // --- Layout ---
-        HorizontalLayout filterRow1 = new HorizontalLayout(searchField, categoryFilter, brandFilter);
-        filterRow1.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
+        // --- Responsive Filter Row using FlexLayout ---
+        com.vaadin.flow.component.orderedlayout.FlexLayout filterRow = new com.vaadin.flow.component.orderedlayout.FlexLayout();
+        filterRow.setWidthFull();
+        filterRow.setFlexWrap(com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP);
+        filterRow.setAlignItems(com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment.BASELINE);
+        filterRow.getStyle().set("gap", "var(--lumo-space-s)");
+        filterRow.add(searchField, categoryFilter, brandFilter, supplierFilter, stockStatusFilter, priceOrderFilter);
 
-        HorizontalLayout filterRow2 = new HorizontalLayout(supplierFilter, stockStatusFilter, priceOrderFilter);
-        filterRow2.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
-
+        // --- Action Buttons ---
         Button addProductBtn = new Button("Nuevo Producto");
         addProductBtn.addClickListener(e -> addProduct());
 
         Button testDataBtn = new Button("Add Test Data");
         testDataBtn.addClickListener(e -> {
             productService.generateTestData();
-            // Refresh filters data
-            categoryFilter.setItems(categoryRepository.findAll());
+            refreshCategories();
             brandFilter.setItems(brandRepository.findAll());
             supplierFilter.setItems(supplierRepository.findAll());
             updateList();
@@ -423,6 +418,7 @@ public class StockView extends VerticalLayout {
                 try {
                     wcSyncService.syncFromWooCommerce();
                     int count = productService.overwriteLocalStockWithWc();
+                    refreshCategories();
                     updateList();
                     if (hasProducts) {
                         Notification.show("Se descargaron los datos y se actualizaron las cantidades de " + count + " productos.", 5000, Notification.Position.MIDDLE);
@@ -447,6 +443,7 @@ public class StockView extends VerticalLayout {
             dialog.setConfirmButtonTheme("error primary");
             dialog.addConfirmListener(event -> {
                 productService.deleteAllProducts();
+                refreshCategories();
                 updateList();
                 Notification.show("Catálogo vaciado.");
             });
@@ -459,15 +456,25 @@ public class StockView extends VerticalLayout {
                 .set("color", "var(--lumo-secondary-text-color)");
         itemCountLabel.setId("item-count-label");
 
-        HorizontalLayout actionButtons = new HorizontalLayout(addProductBtn, syncBtn, restoreWcBtn, purgeBtn, testDataBtn, itemCountLabel);
-        actionButtons.setWidthFull();
-        actionButtons.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
+        com.vaadin.flow.component.orderedlayout.FlexLayout actionRow = new com.vaadin.flow.component.orderedlayout.FlexLayout();
+        actionRow.setWidthFull();
+        actionRow.setFlexWrap(com.vaadin.flow.component.orderedlayout.FlexLayout.FlexWrap.WRAP);
+        actionRow.setAlignItems(com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment.BASELINE);
+        actionRow.getStyle().set("gap", "var(--lumo-space-s)");
+        actionRow.add(addProductBtn, syncBtn, restoreWcBtn, purgeBtn, testDataBtn, itemCountLabel);
 
-        toolbar.add(filterRow1, filterRow2, actionButtons);
+        toolbar.add(filterRow, actionRow);
 
         HorizontalLayout wrapper = new HorizontalLayout(toolbar);
         wrapper.setWidthFull();
         return wrapper;
+    }
+
+    private void refreshCategories() {
+        Set<String> categories = new TreeSet<>();
+        categoryRepository.findAll().forEach(c -> categories.add(c.getName()));
+        productService.findAllWcCategories().forEach(categories::add);
+        categoryFilter.setItems(categories);
     }
 
     public void editProduct(Product product) {
@@ -504,74 +511,48 @@ public class StockView extends VerticalLayout {
     }
 
     private void updateList() {
-        // --- 1. Gather Filter Values ---
-        String searchTerm = searchField.getValue();
-        Category selectedCategory = categoryFilter.getValue();
-        Brand selectedBrand = brandFilter.getValue();
-        Supplier selectedSupplier = supplierFilter.getValue();
-        String stockStatus = stockStatusFilter.getValue();
-        String priceOrder = priceOrderFilter.getValue();
+        ProductFilterDTO filterDTO = new ProductFilterDTO();
+        filterDTO.setSearchText(searchField.getValue());
+        filterDTO.setCategory(categoryFilter.getValue());
+        filterDTO.setBrand(brandFilter.getValue());
+        filterDTO.setSupplier(supplierFilter.getValue());
+        filterDTO.setStockStatus(stockStatusFilter.getValue());
+        filterDTO.setPriceOrder(priceOrderFilter.getValue());
 
-        // --- 2. Build Specification ---
-        Specification<Product> spec = Specification.where(null);
-
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            spec = spec.and(ProductSpecification.hasSkuOrNameLike(searchTerm));
-        }
-        if (selectedCategory != null) {
-            spec = spec.and(ProductSpecification.hasCategory(selectedCategory));
-        }
-        if (selectedBrand != null) {
-            spec = spec.and(ProductSpecification.hasBrand(selectedBrand));
-        }
-        if (selectedSupplier != null) {
-            spec = spec.and(ProductSpecification.hasSupplier(selectedSupplier));
-        }
-
-        // Stock Status Filter
-        if ("Con Stock".equals(stockStatus)) {
-            spec = spec.and(ProductSpecification.hasStockTotalGreaterThan(0));
-        } else if ("Sin Stock".equals(stockStatus)) {
-            spec = spec.and(ProductSpecification.hasStockTotalEquals(0));
-        }
-
-        // --- 3. Execute Query with Sort ---
-        List<Product> products;
-        if (searchTerm != null || selectedCategory != null || selectedBrand != null || selectedSupplier != null
-                || !"Todos".equals(stockStatus)) {
-            ProductFilterDTO filterDTO = new ProductFilterDTO();
-            filterDTO.setSearchText(searchTerm);
-            filterDTO.setCategory(selectedCategory);
-            filterDTO.setBrand(selectedBrand);
-            filterDTO.setSupplier(selectedSupplier);
-            filterDTO.setStockStatus(stockStatus);
-            filterDTO.setPriceOrder(priceOrder);
-            products = productService.findProductsBasedOnFilters(filterDTO);
-        } else {
-            products = productService.findAllProducts(null);
-        }
-
+        List<Product> products = productService.findProductsBasedOnFilters(filterDTO);
         grid.setItems(products);
 
-        // Update item count label
-        java.util.Optional<com.vaadin.flow.component.Component> itemCountComp = toolbar.getChildren()
-                .filter(c -> c instanceof HorizontalLayout)
+        toolbar.getChildren()
                 .flatMap(com.vaadin.flow.component.Component::getChildren)
                 .filter(c -> c.getId().isPresent() && "item-count-label".equals(c.getId().get()))
-                .findFirst();
-
-        itemCountComp.ifPresent(c -> ((Span) c).setText("Total mostrados: " + products.size()));
+                .findFirst()
+                .ifPresent(c -> ((Span) c).setText("Total mostrados: " + products.size()));
     }
 
     private void syncWooCommerce() {
         try {
             Notification.show("Iniciando sincronización con WooCommerce...", 3000, Notification.Position.TOP_CENTER);
-
-            wcSyncService.syncFromWooCommerce();
+            WooCommerceSyncService.SyncResult syncResult = wcSyncService.syncFromWooCommerce();
             wcSyncService.syncToWooCommerce();
+            
+            refreshCategories();
+            updateList();
 
-            updateList(); // Refresh grid
-            Notification.show("Sincronización completada exitosamente.", 5000, Notification.Position.BOTTOM_END);
+            if (syncResult.hasItemsToDelete()) {
+                ConfirmDialog deleteDialog = new ConfirmDialog();
+                deleteDialog.setHeader("Productos huérfanos detectados");
+                deleteDialog.setText("Se encontraron " + syncResult.toDelete() + " productos locales que ya no existen en WooCommerce.");
+                deleteDialog.setConfirmText("Eliminar");
+                deleteDialog.setConfirmButtonTheme("error primary");
+                deleteDialog.setCancelable(true);
+                deleteDialog.addConfirmListener(event -> {
+                    wcSyncService.deleteProductsNotInWooCommerce(syncResult.skusToDelete());
+                    refreshCategories();
+                    updateList();
+                });
+                deleteDialog.open();
+            }
+            Notification.show("Sincronización completada.", 5000, Notification.Position.BOTTOM_END);
         } catch (Exception ex) {
             Notification.show("Error en la sincronización: " + ex.getMessage(), 7000, Notification.Position.MIDDLE);
         }

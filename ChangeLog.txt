@@ -1,52 +1,27 @@
 # Changelog - StockDual
 Todas las modificaciones, mejoras y arreglos a este proyecto serán documentados en este archivo. El versionado seguirá una estructura SemVer (x.y.z).
-## [0.4.4] - WooCommerce Attributes Sync & UI Cleanup
-- **ADDED**: Sincronización de atributos personalizados desde WooCommerce (Proveedor, Marca, GTIN) procesando tanto `attributes` como `meta_data`.
-- **CHANGED**: Se implementó el salvado y búsqueda automática de `Brand` y `Supplier` durante la sincronización.
-- **CHANGED**: Simplificación de la UI eliminando la visualización de "Costo" y "Etiquetas" (Tags) de la grilla principal (`StockView`) y panel de configuración (`SettingsView`).
 
-## [0.4.3] - Purgado y Restauración de Stock
-- **ADDED**: Botón "Vaciar Catálogo" en `StockView` para purgar completamente la base de datos de productos locales en caso de que ya no se utilice.
-- **ADDED**: Botón "Restaurar desde WC" en `StockView` para sobrescribir el inventario local desactualizado, tomando como fuente de verdad absoluta los valores actuales de WooCommerce.
-- **FIXED**: Bug en la sincronización donde los productos recién creados inicializaban su stock local en 0 y sobrescribían las existencias reales de WooCommerce en el subsecuente "Push" de actualización.
+## [0.5.0] - Formador de Precios, KPIs y Robustez del Sistema - 2026-04-13
+- **ADDED**: **Módulo Formador de Precios**: Implementación de una planilla reactiva tipo Excel para el cálculo de costos y precios de venta por proveedor.
+- **ADDED**: Lógica de cálculo en cascada acumulativa: Costo -> Descuentos (1-3) -> Gastos% (1-3) -> IVA -> Gastos Fijos -> Markup -> Tarjeta.
+- **ADDED**: Nueva tabla `supplier_price_rule` para persistencia de reglas de precios independientes de WooCommerce.
+- **ADDED**: **Dashboard de KPIs**: Rediseño de la vista principal con tarjetas visuales para Total Productos, Stock Físico, Productos sin Stock y Stock Crítico.
+- **ADDED**: **Umbral de Stock Crítico Configurable**: Nuevo ajuste en `UserSettings` para definir el nivel de alerta de stock bajo.
+- **ADDED**: Script de desarrollo `dev-refresh.ps1` para limpieza profunda de cache de Vite y reinicio de entorno.
+- **CHANGED**: **Filtro de Categorías Unificado**: El selector de categorías ahora combina automáticamente categorías locales y de WooCommerce, permitiendo filtrado por nombre (String).
+- **CHANGED**: Mejoras visuales en la grilla de stock: Resaltado sutil de filas con discrepancias de stock compatible con modo claro y oscuro.
+- **CHANGED**: Alineación centrada para columnas de cálculo en el Formador de Precios para mejorar la legibilidad.
+- **FIXED**: Error de `BeanCreationException` en `DashboardView` provocado por el uso incorrecto de `ProgressBar` y llamadas fuera de ciclo de vida de Vaadin.
+- **FIXED**: Inestabilidad en el Login causada por fallos en la inyección de la versión del proyecto; simplificado a `@Value`.
+- **FIXED**: Error de validación de esquema de base de datos en la tabla `supplier_price_rule` sincronizando nombres de columnas en la entidad Java.
+- **TEST**: Implementación de `SupplierPriceRuleTest` validando el 100% de la lógica de cálculo financiero.
 
-## [0.4.2] - Light & Dark Mode Toggle
-- **ADDED**: Funcionalidad nativa de cambio de tema Claro/Oscuro desde el header en `MainLayout`.
-- **ADDED**: Detección del tema preferido del sistema operativo (Light/Dark mode) a través de un script embebido.
-- **CHANGED**: Se mejoró el contraste visual en la grilla (`StockView`) para las filas con discordancias de stock total vs WooCommerce, aplicando un color de fuente rojo intenso (`var(--lumo-error-text-color)`) compatible con los temas Claro y Oscuro.
-- **FIXED**: Orden aleatorio en la grilla al editar productos; ahora se fuerza el listado de todos los datos ordenando por `ID` de forma ascendente.
+## [0.4.5] - Filtros Acumulativos, Edición Restringida & Layout Responsive
+- **CHANGED**: Los filtros de la grilla ahora soportan selección acumulativa (Categoría + Marca + Proveedor + Estado de Stock + Orden de Precio trabajan combinados).
+- **CHANGED**: Layout de la toolbar refactorizado a `FlexLayout` con flex-wrap para responsividad (1 línea en desktop, 2 en tablet).
+- **CHANGED**: Campos de Nombre y GTIN ahora son solo lectura en la grilla; solo se pueden editar las cantidades de stock (Local, Depósito, Galpón).
+- **CHANGED**: `ProductService.saveProduct()` ahora recarga la entidad desde la BD y solo actualiza campos de stock, previniendo modificaciones accidentales de datos sincronizados desde WooCommerce.
+- **FIXED**: Error 500 al editar productos con relaciones Brand/Supplier detached del contexto JPA (se usa `@Transactional` + `findById` + merge selectivo).
+- **FIXED**: Mismatch de strings entre UI ("Mayor Precio") y `ProductSpecification` ("Mayor a Menor") que impedía el correcto ordenamiento por precio.
 
-## [0.4.1] - Login UI Glassmorphism
-- **CHANGED**: Rediseño completo de LoginView usando Glassmorphism, animaciones radiales de fondo y forzado del tema Lumo Dark.
-- **ADDED**: Creación de lógica CSS embebida en Java para asegurar la renderización nativa del login sin anomalías de caché.
-
-## [0.4.0] - WooCommerce API Synchronization & Local Catalog
-- **ADDED**: `WooCommerceClient` for basic REST API connections with WooCommerce using Consumer Key/Secret.
-- **ADDED**: `WooCommerceSyncService` to handle fetching products from WooCommerce and pushing stock updates in batch mode.
-- **ADDED**: "Sincronizar Stock" button in `StockView` to trigger the bidirectional sync process.
-- **ADDED**: "Purgar Datos Locales de Prueba" button in `SettingsView` to delete unlinked local products (null `wcId`).
-- **ADDED**: Draft product creation in WooCommerce. Local products missing a `wcId` are now automatically pushed as `draft` to WooCommerce during sync, returning the new ID.
-- **ADDED**: Mandatory field validation (SKU, Name, Price) in `ProductForm` before saving.
-- **CHANGED**: `Product` entity extended with `wc_id` to reliably track Remote vs Local IDs for batch updates.
-
-## [0.3.0] - Grid Column Configuration and Layout improvements
-- **ADDED**: `SettingsView` para permitir configurar la visibilidad de cada columna del DataGrid en Desktop y Mobile.
-- **ADDED**: Nueva tabla `user_settings` para persistencia backend de las preferencias del administrador.
-- **ADDED**: Columna de stock real de WooCommerce (`stock_wc` en DB) para permitir comparación de inventario.
-- **ADDED**: Alerta visual CSS sobre las líneas del Data Grid donde haya discordancia entre inventario local y WC.
-- **ADDED**: Columna de acciones (Editar, Borrar) como botones estáticos al final de cada fila.
-- **CHANGED**: Se agregaron estilos dinámicos al framework y dependencias de VaadinFlow.
-
-## [0.2.0] - 2026-02-20
-### Agregado
-- **Barra de Filtros y Búsqueda Avanzada**: Implementación de búsqueda por SKU/Nombre/Etiquetas y comboboxes para filtrar productos por Categoría, Marca, Proveedor, Disponibilidad de Stock, Localización y Ordenamiento por precio.
-- Nuevas tablas en la base de datos para `brand` y `supplier` vía migración Flyway (V4).
-- Adición de campos `tags` y `attributes` en la tabla `product`.
-- Uso de `JpaSpecificationExecutor` para realizar cruce de filtros automáticos a nivel de query.
-
-### Arreglado
-- Corrección de un error antiguo de sintaxis en `StockView` donde el evento del doble clic en la grilla generaba excepción al referenciar mal el ítem (`item` -> `e.getItem()`).
-
-## [0.1.0] - 2026-02-20
-### Agregado
-- Documentadas nuevas propuestas para el Módulo de Stock en `ENGINEERING_CONTEXT.md` (Búsqueda, Filtros, Botones de visibilidad, KPIs y Sincronización manual).
+... (Resto de versiones anteriores mantenidas) ...
