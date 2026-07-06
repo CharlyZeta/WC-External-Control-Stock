@@ -69,6 +69,17 @@ public class UserSettings {
     @Column(name = "wc_consumer_secret", length = 255)
     private String wcConsumerSecret;
 
+    @Column(name = "gemini_api_key", length = 255)
+    private String geminiApiKey;
+
+    @Column(name = "image_enhance_prompt", columnDefinition = "TEXT")
+    @Builder.Default
+    private String imageEnhancePrompt = "Isolate the product, place it on a clean studio white background, improve lighting and contrast, e-commerce style.";
+
+    @Column(name = "app_base_url", length = 255)
+    @Builder.Default
+    private String appBaseUrl = "http://host.docker.internal:8080";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

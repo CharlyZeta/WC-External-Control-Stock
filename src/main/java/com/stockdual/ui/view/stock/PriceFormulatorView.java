@@ -5,6 +5,7 @@ import com.stockdual.domain.entity.SupplierPriceRule;
 import com.stockdual.domain.repository.SupplierRepository;
 import com.stockdual.domain.repository.SupplierPriceRuleRepository;
 import com.stockdual.ui.layout.MainLayout;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.Shortcuts;
 import com.vaadin.flow.component.button.Button;
@@ -90,60 +91,86 @@ public class PriceFormulatorView extends VerticalLayout {
         var colCost = grid.addColumn(rule -> formatCurrency(rule.getBaseCost()))
                 .setHeader("Costo Base").setEditorComponent(baseCostField)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
-                .setClassNameGenerator(rule -> "group-separator-column");
+                .setClassNameGenerator(rule -> {
+                    String classes = "group-separator-column";
+                    if (isZero(rule.getBaseCost())) classes += " dimmed-cell";
+                    return classes;
+                });
 
         // Descuentos (Cascada)
         BigDecimalField d1f = createEditorField();
         binder.forField(d1f).bind(SupplierPriceRule::getDiscount1, SupplierPriceRule::setDiscount1);
-        var colD1 = grid.addColumn(rule -> formatPercent(rule.getDiscount1())).setHeader("Dto 1").setEditorComponent(d1f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        var colD1 = grid.addColumn(rule -> formatPercent(rule.getDiscount1())).setHeader("Dto 1").setEditorComponent(d1f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
+                .setClassNameGenerator(rule -> isZero(rule.getDiscount1()) ? "dimmed-cell" : null);
 
         BigDecimalField d2f = createEditorField();
         binder.forField(d2f).bind(SupplierPriceRule::getDiscount2, SupplierPriceRule::setDiscount2);
-        var colD2 = grid.addColumn(rule -> formatPercent(rule.getDiscount2())).setHeader("Dto 2").setEditorComponent(d2f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        var colD2 = grid.addColumn(rule -> formatPercent(rule.getDiscount2())).setHeader("Dto 2").setEditorComponent(d2f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
+                .setClassNameGenerator(rule -> isZero(rule.getDiscount2()) ? "dimmed-cell" : null);
 
         BigDecimalField d3f = createEditorField();
         binder.forField(d3f).bind(SupplierPriceRule::getDiscount3, SupplierPriceRule::setDiscount3);
         var colD3 = grid.addColumn(rule -> formatPercent(rule.getDiscount3())).setHeader("Dto 3").setEditorComponent(d3f)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
-                .setClassNameGenerator(rule -> "group-separator-column");
+                .setClassNameGenerator(rule -> {
+                    String classes = "group-separator-column";
+                    if (isZero(rule.getDiscount3())) classes += " dimmed-cell";
+                    return classes;
+                });
 
         // Gastos %
         BigDecimalField g1f = createEditorField();
         binder.forField(g1f).bind(SupplierPriceRule::getPercExpense1, SupplierPriceRule::setPercExpense1);
-        var colG1 = grid.addColumn(rule -> formatPercent(rule.getPercExpense1())).setHeader("G1 %").setEditorComponent(g1f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        var colG1 = grid.addColumn(rule -> formatPercent(rule.getPercExpense1())).setHeader("G1 %").setEditorComponent(g1f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
+                .setClassNameGenerator(rule -> isZero(rule.getPercExpense1()) ? "dimmed-cell" : null);
 
         BigDecimalField g2f = createEditorField();
         binder.forField(g2f).bind(SupplierPriceRule::getPercExpense2, SupplierPriceRule::setPercExpense2);
-        var colG2 = grid.addColumn(rule -> formatPercent(rule.getPercExpense2())).setHeader("G2 %").setEditorComponent(g2f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        var colG2 = grid.addColumn(rule -> formatPercent(rule.getPercExpense2())).setHeader("G2 %").setEditorComponent(g2f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
+                .setClassNameGenerator(rule -> isZero(rule.getPercExpense2()) ? "dimmed-cell" : null);
 
         BigDecimalField g3f = createEditorField();
         binder.forField(g3f).bind(SupplierPriceRule::getPercExpense3, SupplierPriceRule::setPercExpense3);
-        var colG3 = grid.addColumn(rule -> formatPercent(rule.getPercExpense3())).setHeader("G3 %").setEditorComponent(g3f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        var colG3 = grid.addColumn(rule -> formatPercent(rule.getPercExpense3())).setHeader("G3 %").setEditorComponent(g3f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
+                .setClassNameGenerator(rule -> isZero(rule.getPercExpense3()) ? "dimmed-cell" : null);
 
         // IVA
         BigDecimalField ivaF = createEditorField();
         binder.forField(ivaF).bind(SupplierPriceRule::getIvaPercentage, SupplierPriceRule::setIvaPercentage);
         var colIVA = grid.addColumn(rule -> formatPercent(rule.getIvaPercentage())).setHeader("IVA %").setEditorComponent(ivaF)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
-                .setClassNameGenerator(rule -> "group-separator-column");
+                .setClassNameGenerator(rule -> {
+                    String classes = "group-separator-column";
+                    if (isZero(rule.getIvaPercentage())) classes += " dimmed-cell";
+                    return classes;
+                });
 
         // Gastos Fijos (Montos)
         BigDecimalField f1f = createEditorField();
         binder.forField(f1f).bind(SupplierPriceRule::getFixedExpense1, SupplierPriceRule::setFixedExpense1);
-        var colF1 = grid.addColumn(rule -> formatCurrency(rule.getFixedExpense1())).setHeader("Fijo 1").setEditorComponent(f1f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER);
+        var colF1 = grid.addColumn(rule -> formatCurrency(rule.getFixedExpense1())).setHeader("Fijo 1").setEditorComponent(f1f).setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
+                .setClassNameGenerator(rule -> isZero(rule.getFixedExpense1()) ? "dimmed-cell" : null);
 
         BigDecimalField f2f = createEditorField();
         binder.forField(f2f).bind(SupplierPriceRule::getFixedExpense2, SupplierPriceRule::setFixedExpense2);
         var colF2 = grid.addColumn(rule -> formatCurrency(rule.getFixedExpense2())).setHeader("Fijo 2").setEditorComponent(f2f)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
-                .setClassNameGenerator(rule -> "group-separator-column");
+                .setClassNameGenerator(rule -> {
+                    String classes = "group-separator-column";
+                    if (isZero(rule.getFixedExpense2())) classes += " dimmed-cell";
+                    return classes;
+                });
 
         // Markup
         BigDecimalField mupF = createEditorField();
         binder.forField(mupF).bind(SupplierPriceRule::getMarkupPercentage, SupplierPriceRule::setMarkupPercentage);
         var colMarkup = grid.addColumn(rule -> formatPercent(rule.getMarkupPercentage())).setHeader("Markup").setEditorComponent(mupF)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
-                .setClassNameGenerator(rule -> "group-separator-column");
+                .setClassNameGenerator(rule -> {
+                    String classes = "group-separator-column";
+                    if (isZero(rule.getMarkupPercentage())) classes += " dimmed-cell";
+                    return classes;
+                });
 
         // --- RESULTADOS ---
         var colFinal = grid.addColumn(rule -> formatCurrency(rule.getCalculatedFinalPrice()))
@@ -157,7 +184,8 @@ public class PriceFormulatorView extends VerticalLayout {
         var colCard = grid.addColumn(rule -> formatPercent(rule.getCardPercentage()))
                 .setHeader("% Tarjeta").setEditorComponent(crdF)
                 .setTextAlign(com.vaadin.flow.component.grid.ColumnTextAlign.CENTER)
-                .setFrozenToEnd(true);
+                .setFrozenToEnd(true)
+                .setClassNameGenerator(rule -> isZero(rule.getCardPercentage()) ? "dimmed-cell" : null);
 
         var colList = grid.addColumn(rule -> formatCurrency(rule.getCalculatedListPrice()))
                 .setHeader("LISTA")
@@ -187,7 +215,7 @@ public class PriceFormulatorView extends VerticalLayout {
         groupHeader.join(colD1, colD2, colD3).setComponent(createGroupLabel("DESCUENTOS", "rgba(239, 68, 68, 0.1)"));
         groupHeader.join(colG1, colG2, colG3, colIVA).setComponent(createGroupLabel("CARGOS %", "rgba(245, 158, 11, 0.1)"));
         groupHeader.join(colF1, colF2).setComponent(createGroupLabel("FIJOS $", "rgba(16, 185, 129, 0.1)"));
-        groupHeader.join(colMarkup).setComponent(createGroupLabel("MARGEN", "rgba(139, 92, 246, 0.1)"));
+        groupHeader.getCell(colMarkup).setComponent(createGroupLabel("MARGEN", "rgba(139, 92, 246, 0.1)"));
         groupHeader.join(colFinal, colCard, colList).setComponent(createGroupLabel("PRECIOS DE VENTA", "var(--lumo-contrast-5pct)"));
 
         // Eventos del Editor
@@ -279,5 +307,9 @@ public class PriceFormulatorView extends VerticalLayout {
     private String formatPercent(BigDecimal amount) {
         if (amount == null) amount = BigDecimal.ZERO;
         return amount.setScale(2, RoundingMode.HALF_UP).toString() + "%";
+    }
+
+    private boolean isZero(BigDecimal value) {
+        return value == null || value.compareTo(BigDecimal.ZERO) == 0;
     }
 }

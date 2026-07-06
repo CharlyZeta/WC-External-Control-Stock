@@ -51,6 +51,14 @@ public class SettingsView extends VerticalLayout {
                         "Consumer Key");
         private final com.vaadin.flow.component.textfield.PasswordField wcConsumerSecret = new com.vaadin.flow.component.textfield.PasswordField(
                         "Consumer Secret");
+ 
+        // Gemini and App Base URL Configurations
+        private final com.vaadin.flow.component.textfield.PasswordField geminiApiKey = new com.vaadin.flow.component.textfield.PasswordField(
+                        "Gemini API Key");
+        private final com.vaadin.flow.component.textfield.TextArea imageEnhancePrompt = new com.vaadin.flow.component.textfield.TextArea(
+                        "Prompt de Optimización de Fotos");
+        private final com.vaadin.flow.component.textfield.TextField appBaseUrl = new com.vaadin.flow.component.textfield.TextField(
+                        "Dirección Base de la Aplicación (CORS/Docker)");
 
         public SettingsView(UserSettingsRepository settingsRepository, WooCommerceClient wooCommerceClient,
                         ProductService productService) {
@@ -124,6 +132,19 @@ public class SettingsView extends VerticalLayout {
 
                 add(wcApiUrl, wcKeysLayout, actionButtons);
 
+                // Gemini and Base URL layout
+                add(new Hr());
+                add(new H2("Asistente IA & Base URL"));
+                add(new Span("Configura las credenciales de Google Gemini para la generación de copy y la URL base para que WooCommerce acceda a las imágenes."));
+                
+                geminiApiKey.setWidthFull();
+                imageEnhancePrompt.setWidthFull();
+                imageEnhancePrompt.setPlaceholder("Ej: Isolate the product on a white studio background...");
+                appBaseUrl.setWidthFull();
+                appBaseUrl.setPlaceholder("http://host.docker.internal:8080");
+                
+                add(geminiApiKey, imageEnhancePrompt, appBaseUrl);
+ 
                 saveButton.getStyle().set("margin-top", "var(--lumo-space-l)");
                 add(saveButton);
         }
@@ -159,6 +180,10 @@ public class SettingsView extends VerticalLayout {
                                 .setValue(currentSettings.getWcConsumerSecret() != null
                                                 ? currentSettings.getWcConsumerSecret()
                                                 : "");
+
+                geminiApiKey.setValue(currentSettings.getGeminiApiKey() != null ? currentSettings.getGeminiApiKey() : "");
+                imageEnhancePrompt.setValue(currentSettings.getImageEnhancePrompt() != null ? currentSettings.getImageEnhancePrompt() : "");
+                appBaseUrl.setValue(currentSettings.getAppBaseUrl() != null ? currentSettings.getAppBaseUrl() : "");
         }
 
         @Transactional
@@ -182,6 +207,10 @@ public class SettingsView extends VerticalLayout {
                 currentSettings.setWcApiUrl(wcApiUrl.getValue());
                 currentSettings.setWcConsumerKey(wcConsumerKey.getValue());
                 currentSettings.setWcConsumerSecret(wcConsumerSecret.getValue());
+
+                currentSettings.setGeminiApiKey(geminiApiKey.getValue());
+                currentSettings.setImageEnhancePrompt(imageEnhancePrompt.getValue());
+                currentSettings.setAppBaseUrl(appBaseUrl.getValue());
 
                 settingsRepository.save(currentSettings);
                 Notification.show("Configuraciones guardadas exitosamente", 3000, Notification.Position.BOTTOM_END);

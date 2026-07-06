@@ -62,32 +62,5 @@ public class ProductSpecification {
         };
     }
 
-    public static Specification<Product> hasSkuOrNameLike(String searchText) {
-        return (root, query, criteriaBuilder) -> {
-            String likePattern = "%" + searchText.toLowerCase() + "%";
-            Predicate namePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern);
-            Predicate skuPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("sku")), likePattern);
-            return criteriaBuilder.or(namePredicate, skuPredicate);
-        };
-    }
 
-    public static Specification<Product> hasCategory(com.stockdual.domain.entity.Category category) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("category"), category);
-    }
-
-    public static Specification<Product> hasBrand(com.stockdual.domain.entity.Brand brand) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("brand"), brand);
-    }
-
-    public static Specification<Product> hasSupplier(com.stockdual.domain.entity.Supplier supplier) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("supplier"), supplier);
-    }
-
-    public static Specification<Product> hasStockTotalGreaterThan(int amount) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("stockTotal"), amount);
-    }
-
-    public static Specification<Product> hasStockTotalEquals(int amount) {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("stockTotal"), amount);
-    }
 }

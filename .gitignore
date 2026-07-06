@@ -50,3 +50,7 @@ docker-compose.override.yml
 
 ## Agents
 .agents/
+
+## Custom Uploads & Configs
+uploaded-images/
+.gemini/

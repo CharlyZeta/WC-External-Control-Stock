@@ -14,6 +14,7 @@ Todas las modificaciones, mejoras y arreglos a este proyecto serán documentados
 - **FIXED**: Error de `BeanCreationException` en `DashboardView` provocado por el uso incorrecto de `ProgressBar` y llamadas fuera de ciclo de vida de Vaadin.
 - **FIXED**: Inestabilidad en el Login causada por fallos en la inyección de la versión del proyecto; simplificado a `@Value`.
 - **FIXED**: Error de validación de esquema de base de datos en la tabla `supplier_price_rule` sincronizando nombres de columnas en la entidad Java.
+- **FIXED**: Error de compilación en `PriceFormulatorView.java` por falta de importación de la clase `Component`.
 - **TEST**: Implementación de `SupplierPriceRuleTest` validando el 100% de la lógica de cálculo financiero.
 
 ## [0.4.5] - Filtros Acumulativos, Edición Restringida & Layout Responsive

@@ -7,6 +7,7 @@ import com.stockdual.ui.view.purchase.PurchaseView;
 import com.stockdual.ui.view.settings.SettingsView;
 import com.stockdual.ui.view.stock.PriceFormulatorView;
 import com.stockdual.ui.view.stock.StockView;
+import com.stockdual.ui.view.stock.ProductCreatorView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -115,6 +116,7 @@ public class MainLayout extends AppLayout {
 
         nav.addItem(new SideNavItem("Dashboard", DashboardView.class, VaadinIcon.DASHBOARD.create()));
         nav.addItem(new SideNavItem("Control de Stock", StockView.class, VaadinIcon.STORAGE.create()));
+        nav.addItem(new SideNavItem("Creador Productos", ProductCreatorView.class, VaadinIcon.PLUS_CIRCLE.create()));
         nav.addItem(new SideNavItem("Formador Precios", PriceFormulatorView.class, VaadinIcon.CALC_BOOK.create()));
         nav.addItem(new SideNavItem("Compras", PurchaseView.class, VaadinIcon.CART.create()));
         nav.addItem(new SideNavItem("Terminal POS", PosView.class, VaadinIcon.SHOP.create()));

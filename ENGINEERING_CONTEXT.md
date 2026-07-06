@@ -6,12 +6,12 @@
 **Target Audience**: Businesses requiring robust inventory control across multiple locations (Local, Depósito, Galpón) and a physical POS, synchronized with an online WooCommerce store.
 
 ## 2. Technology Stack
-- **Languages**: Java 21, SQL.
+- **Languages**: Java 25 (Amazon Corretto), SQL.
 - **Framework**: Spring Boot 3.4.2 (Web, Data JPA, Security, Validation).
 - **UI Framework**: Vaadin Flow 24.6 (Java-only frontend, Server-side rendering).
 - **Database**: PostgreSQL 16 (Dockerized, Port 5433).
 - **Build/Dependency**: Maven (`./mvnw`).
-- **Tools**: Docker Compose, Flyway (DB Migration), Lombok.
+- **Tools**: Docker Compose, Flyway (DB Migration), Lombok, Sejda WebP ImageIO.
 
 ## 3. Core Architecture & Patterns
 - **Domain Layer**: JPA Entities annotated with `@Entity`, `@Data`, `@Builder`.
@@ -58,6 +58,12 @@
     - **Forms**: Side-drawers or Dialogs, never full page refreshes.
     - **Feedback**: Immediate validation, Toast notifications (`Notification.show`).
 
+### D. Intelligent Product Creator (Vaadin + Gemini AI)
+- **Camera Capture**: Integrated using HTML5 `<input type="file" capture="environment">` inside Vaadin's upload component to support mobile rear camera capture.
+- **Background Cleanup**: Programmatic background un-saturation (off-white un-noising to pure white `#FFFFFF`) in `ImageProcessingService` and local 650x650px WebP cropping.
+- **Gemini Multimodal AI**: Multimodal e-commerce copywriting service (`gemini-2.0-flash`) that generates product name, descriptions, short descriptions, and tags in structured JSON formats directly from the raw camera image bytes.
+- **WooCommerce Extended Sync**: Submits full drafts containing categories, dimensions, weight, google/facebook meta-data, tags, and local host image maps (`host.docker.internal:8080/images/{filename}.webp`).
+
 ## 5. Development Guidelines
 - **Database Changes**: ALWAYS use Flyway migrations (`src/main/resources/db/migration`).
     - Naming: `V{version}__{description}.sql`
@@ -82,6 +88,14 @@
         - [x] Bidirectional sync (Batch Update for Stock).
         - [x] Local Test Data Purging.
         - [x] Draft creation in WC for unlinked local products.
+    - **Feature - Intelligent Product Creator (v0.5.0)**:
+        - [x] Database schema V13 applied (Medidas, SEO & Gemini settings).
+        - [x] Responsive ProductCreatorView for mobile/desktop.
+        - [x] Mobile native camera integration using capture environment.
+        - [x] Gemini multimodal REST service for automatic copywriting and tag generation.
+        - [x] Local WebP processing (650x650px) with background un-saturation.
+        - [x] WooCommerce extended draft creation API sync.
+        - [x] Unit Test coverage >90% (8 tests passing successfully).
     - **Next Steps**:
         - [ ] Reporting Module.
         - [ ] Webhooks for real-time Woo to Local signals.

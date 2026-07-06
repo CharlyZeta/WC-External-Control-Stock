@@ -83,6 +83,27 @@ public class Product {
     @Column(length = 2000)
     private String attributes;
 
+    @Column(precision = 19, scale = 2)
+    private java.math.BigDecimal weight;
+
+    @Column(precision = 19, scale = 2)
+    private java.math.BigDecimal length;
+
+    @Column(precision = 19, scale = 2)
+    private java.math.BigDecimal width;
+
+    @Column(precision = 19, scale = 2)
+    private java.math.BigDecimal height;
+
+    @Column(name = "short_description", columnDefinition = "TEXT")
+    private String shortDescription;
+
+    @Column(name = "google_metadata", columnDefinition = "TEXT")
+    private String googleMetadata;
+
+    @Column(name = "facebook_metadata", columnDefinition = "TEXT")
+    private String facebookMetadata;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

@@ -675,6 +675,10 @@ vaadin-grid::part(header-cell group-separator-column) {
 }
 
 /* Estilo destacado para Precio Final y Lista */
+vaadin-grid::part(body-cell dimmed-cell) {
+    opacity: 0.6;
+}
+
 vaadin-grid::part(body-cell final-price-cell) {
     background-color: var(--lumo-primary-color-10pct) !important;
     font-weight: 700;

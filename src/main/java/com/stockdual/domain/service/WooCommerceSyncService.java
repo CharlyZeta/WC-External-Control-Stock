@@ -311,6 +311,37 @@ public class WooCommerceSyncService {
         return null;
     }
 
+    @Transactional
+    public Long createDraftProductInWc(Product p, String appBaseUrl) {
+        UserSettings settings = getSettings();
+        if (!validateSettings(settings)) {
+            throw new IllegalStateException("WooCommerce API settings are not fully configured.");
+        }
+        
+        // Save product locally first if it hasn't been saved yet
+        productRepository.save(p);
+        
+        try {
+            Long newWcId = wcClient.createDraftProductExtended(
+                    settings.getWcApiUrl(),
+                    settings.getWcConsumerKey(),
+                    settings.getWcConsumerSecret(),
+                    p,
+                    appBaseUrl);
+            
+            if (newWcId != null) {
+                p.setWcId(newWcId);
+                p.setStockWc(p.getStockTotal());
+                productRepository.save(p);
+                log.info("Successfully synced new draft product to WC. ID: {}", newWcId);
+            }
+            return newWcId;
+        } catch (Exception e) {
+            log.error("Failed to sync new draft product to WooCommerce", e);
+            throw new RuntimeException("Error syncing new product to WooCommerce: " + e.getMessage(), e);
+        }
+    }
+
     private UserSettings getSettings() {
         return settingsRepository.findByUserId("admin")
                 .orElseThrow(() -> new IllegalStateException("User settings not found."));
