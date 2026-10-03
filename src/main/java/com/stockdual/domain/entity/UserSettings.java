@@ -64,12 +64,15 @@ public class UserSettings {
     private String wcApiUrl;
 
     @Column(name = "wc_consumer_key", length = 255)
+    @Convert(converter = com.stockdual.infrastructure.crypto.EncryptedStringConverter.class)
     private String wcConsumerKey;
 
     @Column(name = "wc_consumer_secret", length = 255)
+    @Convert(converter = com.stockdual.infrastructure.crypto.EncryptedStringConverter.class)
     private String wcConsumerSecret;
 
     @Column(name = "gemini_api_key", length = 255)
+    @Convert(converter = com.stockdual.infrastructure.crypto.EncryptedStringConverter.class)
     private String geminiApiKey;
 
     @Column(name = "image_enhance_prompt", columnDefinition = "TEXT")

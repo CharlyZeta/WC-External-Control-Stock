@@ -5,9 +5,11 @@ import com.stockdual.domain.repository.AppUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Profile({"dev", "default"})
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -24,15 +26,22 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (!userRepository.existsByUsername("admin")) {
+            String adminPassword = System.getenv("STOCKDUAL_ADMIN_PASSWORD");
+            if (adminPassword == null || adminPassword.trim().isEmpty()) {
+                throw new IllegalStateException(
+                    "Variable de entorno STOCKDUAL_ADMIN_PASSWORD no está configurada. " +
+                    "Debe proporcionarse para crear el usuario administrador."
+                );
+            }
             AppUser admin = AppUser.builder()
                     .username("admin")
-                    .passwordHash(passwordEncoder.encode("admin123"))
+                    .passwordHash(passwordEncoder.encode(adminPassword))
                     .displayName("Administrador")
                     .role("ADMIN")
                     .active(true)
                     .build();
             userRepository.save(admin);
-            log.info("✅ Usuario admin creado (admin / admin123). Cambiá la contraseña en producción.");
+            log.info("✅ Usuario admin creado (admin / *******).");
         } else {
             log.info("ℹ️ Usuario admin ya existe, no se creó nuevamente.");
         }

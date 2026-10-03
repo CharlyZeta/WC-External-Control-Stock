@@ -1,6 +1,26 @@
 # Changelog - StockDual
 Todas las modificaciones, mejoras y arreglos a este proyecto serán documentados en este archivo. El versionado seguirá una estructura SemVer (x.y.z).
 
+## [0.7.0] - Mejoras de Seguridad y Conformidad - 2026-10-01
+- **ADDED**: `FIX-0001.md` - Contrato SDD-GL que documenta las mejoras de seguridad críticas (Fase 1).
+- **CHANGED**: `EncryptedStringConverter.java` - **ELIMINADA** clave hardcodeada; ahora lanza `IllegalStateException` si la variable de entorno `STOCKDUAL_ENCRYPTION_KEY` no está configurada.
+- **CHANGED**: `DataInitializer.java` - **ELIMINADA** contraseña hardcodeada; ahora lanza `IllegalStateException` si la variable de entorno `STOCKDUAL_ADMIN_PASSWORD` no está configurada.
+- **CHANGED**: `SecurityConfig.java` - Mejorado con comentarios justificativos detallados para cada directiva CSP, especialmente `script-src 'unsafe-inline'` y `style-src 'unsafe-inline'`.
+- **ADDED**: Tests unitarios `EncryptedStringConverterTest.java` - Verifican el uso de clave desde variable de entorno y fallback para texto plano.
+- **ADDED**: Tests unitarios `DataInitializerTest.java` - Validan las validaciones de contraseña de admin.
+- **ADDED**: Tests unitarios `SecurityConfigTest.java` - Validan la documentación justificativa del CSP.
+- **ADDED**: `contracts/FIX-0001.md` - Especificación SDD-GL completa con 5 Acceptance Criteria validados por 19 tests unitarios.
+- **CHANGED**: `contracts/FEAT-0001.md` - Status actualizado a `RESOLVED` con 6/6 criterios cumplidos.
+
+## [0.6.0] - Seguridad, DTOs y Optimización de Consultas - 2026-08-05
+- **ADDED**: JPA `EncryptedStringConverter` que utiliza **AES/GCM/NoPadding** para encriptar de manera transparente credenciales en `UserSettings` (`wc_consumer_key`, `wc_consumer_secret`, `gemini_api_key`).
+- **ADDED**: DTO `WcProductCreateRequest` para tipado estructurado de solicitudes de creación de borradores de productos en WooCommerce.
+- **CHANGED**: `WooCommerceClient` refactorizado para usar **Basic Auth** en la cabecera HTTP en lugar de pasar credenciales por la URL (query parameters).
+- **CHANGED**: `WooCommerceSyncService.syncFromWooCommerce()` optimizado para cargar productos locales en lote mediante `findBySkuIn`, solucionando el problema N+1 selectivo.
+- **CHANGED**: `DataInitializer` restringido a perfiles `dev` y `default` mediante `@Profile` y modificado para leer contraseña del admin desde variable de entorno `STOCKDUAL_ADMIN_PASSWORD` con fallback.
+- **CHANGED**: Endurecida la política CSP en `SecurityConfig.java` eliminando `'unsafe-eval'` de la directiva `script-src` y documentando la necesidad de `'unsafe-inline'`.
+- **TEST**: Creados tests unitarios para `EncryptedStringConverterTest` y refactorizados los tests de `WooCommerceClientTest` con tipos seguros.
+
 ## [0.5.0] - Formador de Precios, KPIs y Robustez del Sistema - 2026-04-13
 - **ADDED**: **Módulo Formador de Precios**: Implementación de una planilla reactiva tipo Excel para el cálculo de costos y precios de venta por proveedor.
 - **ADDED**: Lógica de cálculo en cascada acumulativa: Costo -> Descuentos (1-3) -> Gastos% (1-3) -> IVA -> Gastos Fijos -> Markup -> Tarjeta.
@@ -24,5 +44,3 @@ Todas las modificaciones, mejoras y arreglos a este proyecto serán documentados
 - **CHANGED**: `ProductService.saveProduct()` ahora recarga la entidad desde la BD y solo actualiza campos de stock, previniendo modificaciones accidentales de datos sincronizados desde WooCommerce.
 - **FIXED**: Error 500 al editar productos con relaciones Brand/Supplier detached del contexto JPA (se usa `@Transactional` + `findById` + merge selectivo).
 - **FIXED**: Mismatch de strings entre UI ("Mayor Precio") y `ProductSpecification` ("Mayor a Menor") que impedía el correcto ordenamiento por precio.
-
-... (Resto de versiones anteriores mantenidas) ...

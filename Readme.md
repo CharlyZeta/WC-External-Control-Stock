@@ -1,5 +1,9 @@
 # 🚀 StockDual — Sistema Empresarial de Control de Stock e Integración con WooCommerce & IA
 
+<p align="center">
+  <img src="docs/images/stockdual_banner.jpg" alt="StockDual Banner" width="100%" />
+</p>
+
 [![Java](https://img.shields.io/badge/Java%2025-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot%203.4.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
 [![Vaadin](https://img.shields.io/badge/Vaadin%2024.6.4-00B4F0?style=for-the-badge&logo=vaadin&logoColor=white)](https://vaadin.com/)

@@ -49,6 +49,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     java.util.Optional<Product> findBySku(String sku);
 
+    @EntityGraph(attributePaths = { "category", "brand", "supplier" })
+    List<Product> findBySkuIn(List<String> skus);
+
     @Query("select p from Product p where p.stockTotal != p.stockWc and p.wcId is not null")
     List<Product> findMismatchedProductsForSync();
 

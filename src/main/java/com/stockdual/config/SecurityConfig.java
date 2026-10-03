@@ -18,10 +18,10 @@ public class SecurityConfig extends VaadinWebSecurity {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
+@Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
-        // Configurar CSP para permitir imágenes externas (WooCommerce)
+        // Configurar CSP para permitir imágenes externas (WooCommerce) y endurecer script execution
         http.headers(headers -> headers
             .contentSecurityPolicy(csp -> csp
                 .policyDirectives(
@@ -29,7 +29,13 @@ public class SecurityConfig extends VaadinWebSecurity {
                     "img-src 'self' data: https: blob: http:; " +
                     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
                     "font-src 'self' https://fonts.gstatic.com data:; " +
-                    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                    // NOTE: 'unsafe-inline' es estrictamente necesario para que Vaadin Flow inyecte:
+                    // 1. Bloques de script bootstrap esenciales para inicialización del framework
+                    // 2. Sincronización de estados de UI mediante setTimeout y event listeners
+                    // 3. Estilos dinámicos generados por componentes de interacción de usuario
+                    // SEE: https://vaadin.com/docs/latest/security/content-security-policy
+                    // FUTURE: Evaluar migración a hashes de recursos noces si Vaadin lo permite
+                    "script-src 'self' 'unsafe-inline'; " +
                     "connect-src 'self' https:; " +
                     "frame-ancestors 'self'; " +
                     "base-uri 'self';"

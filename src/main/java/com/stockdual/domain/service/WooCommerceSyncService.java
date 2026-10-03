@@ -59,6 +59,14 @@ public class WooCommerceSyncService {
             int createdCount = 0;
             java.util.Set<String> wcSkus = new java.util.HashSet<>();
 
+            List<String> skus = wcProducts.stream()
+                    .map(WcProductResponse::getSku)
+                    .filter(sku -> sku != null && !sku.trim().isEmpty())
+                    .toList();
+
+            java.util.Map<String, Product> localBySku = productRepository.findBySkuIn(skus).stream()
+                    .collect(java.util.stream.Collectors.toMap(Product::getSku, p -> p));
+
             for (WcProductResponse wcProduct : wcProducts) {
                 if (wcProduct.getSku() == null || wcProduct.getSku().isEmpty()) {
                     continue; // Skip products without SKU
@@ -69,9 +77,8 @@ public class WooCommerceSyncService {
                 log.info("Processing {}, manageStock={}, stockQuantity={}",
                         wcProduct.getSku(), wcProduct.getManageStock(), wcProduct.getStockQuantity());
 
-                Optional<Product> productOpt = productRepository.findBySku(wcProduct.getSku());
-                if (productOpt.isPresent()) {
-                    Product product = productOpt.get();
+                Product product = localBySku.get(wcProduct.getSku());
+                if (product != null) {
                     product.setStockWc(wcProduct.getStockQuantity() != null ? wcProduct.getStockQuantity() : 0);
                     product.setWcId(wcProduct.getId());
                     // Sync price and name back from WooCommerce if they exist

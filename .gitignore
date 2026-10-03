@@ -55,3 +55,4 @@ docker-compose.override.yml
 ## Custom Uploads & Configs
 uploaded-images/
 .gemini/
+graphify-out/

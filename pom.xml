@@ -138,6 +138,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>-Dnet.bytebuddy.experimental=true</argLine>
+                    <environmentVariables>
+                        <STOCKDUAL_ENCRYPTION_KEY>test-encryption-key-32-bytes!!</STOCKDUAL_ENCRYPTION_KEY>
+                        <STOCKDUAL_ADMIN_PASSWORD>testAdminPassword123</STOCKDUAL_ADMIN_PASSWORD>
+                    </environmentVariables>
                 </configuration>
             </plugin>
             <plugin>

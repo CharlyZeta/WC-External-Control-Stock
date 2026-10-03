@@ -2,6 +2,8 @@ package com.stockdual.infrastructure.client;
 
 import com.stockdual.infrastructure.client.dto.WcBatchUpdateRequest;
 import com.stockdual.infrastructure.client.dto.WcProductResponse;
+import com.stockdual.infrastructure.client.dto.WcProductCreateRequest;
+import com.stockdual.infrastructure.client.dto.WcMetaData;
 import com.stockdual.domain.entity.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -38,15 +40,16 @@ public class WooCommerceClient {
 
         String endpoint = formatEndpoint(url, "/wp-json/wc/v3/system_status");
         log.info("Testing WooCommerce connection to: {}", endpoint);
-        
-        // Use Query String Auth for HTTP/Localhost
-        String authUrl = UriComponentsBuilder.fromHttpUrl(endpoint)
-                .queryParam("consumer_key", key)
-                .queryParam("consumer_secret", secret)
-                .toUriString();
+
+        HttpHeaders headers = createAuthHeaders(key, secret);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(authUrl, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    endpoint,
+                    HttpMethod.GET,
+                    entity,
+                    String.class);
             log.info("WooCommerce connection successful. Status: {}", response.getStatusCode());
             return response.getStatusCode().is2xxSuccessful();
         } catch (org.springframework.web.client.HttpClientErrorException e) {
@@ -74,20 +77,20 @@ public class WooCommerceClient {
         boolean hasMore = true;
 
         String endpoint = formatEndpoint(url, "/wp-json/wc/v3/products");
+        HttpHeaders headers = createAuthHeaders(key, secret);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
         try {
             while (hasMore) {
                 String pagedUrl = UriComponentsBuilder.fromHttpUrl(endpoint)
                         .queryParam("page", page)
                         .queryParam("per_page", perPage)
-                        .queryParam("consumer_key", key)
-                        .queryParam("consumer_secret", secret)
                         .toUriString();
 
                 ResponseEntity<List<WcProductResponse>> response = restTemplate.exchange(
                         pagedUrl,
                         HttpMethod.GET,
-                        null,
+                        entity,
                         new ParameterizedTypeReference<List<WcProductResponse>>() {
                         });
 
@@ -125,16 +128,12 @@ public class WooCommerceClient {
      */
     public boolean batchUpdateProducts(String url, String key, String secret, WcBatchUpdateRequest request) {
         String endpoint = formatEndpoint(url, "/wp-json/wc/v3/products/batch");
-        String authUrl = UriComponentsBuilder.fromHttpUrl(endpoint)
-                .queryParam("consumer_key", key)
-                .queryParam("consumer_secret", secret)
-                .toUriString();
-
-        HttpEntity<WcBatchUpdateRequest> entity = new HttpEntity<>(request);
+        HttpHeaders headers = createAuthHeaders(key, secret);
+        HttpEntity<WcBatchUpdateRequest> entity = new HttpEntity<>(request, headers);
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    authUrl,
+                    endpoint,
                     HttpMethod.POST,
                     entity,
                     String.class);
@@ -148,29 +147,23 @@ public class WooCommerceClient {
     public Long createDraftProduct(String url, String key, String secret, String name, String sku,
             java.math.BigDecimal price, Integer stockQuantity) {
         String endpoint = formatEndpoint(url, "/wp-json/wc/v3/products");
-        String authUrl = UriComponentsBuilder.fromHttpUrl(endpoint)
-                .queryParam("consumer_key", key)
-                .queryParam("consumer_secret", secret)
-                .toUriString();
 
-        java.util.Map<String, Object> payload = new java.util.HashMap<>();
-        payload.put("name", name);
-        payload.put("type", "simple");
-        payload.put("status", "draft");
-        payload.put("sku", sku);
-        if (price != null) {
-            payload.put("regular_price", price.toString());
-        }
-        if (stockQuantity != null) {
-            payload.put("manage_stock", true);
-            payload.put("stock_quantity", stockQuantity);
-        }
+        WcProductCreateRequest payload = WcProductCreateRequest.builder()
+                .name(name)
+                .type("simple")
+                .status("draft")
+                .sku(sku)
+                .regularPrice(price != null ? price.toString() : null)
+                .manageStock(stockQuantity != null ? true : null)
+                .stockQuantity(stockQuantity)
+                .build();
 
-        HttpEntity<java.util.Map<String, Object>> entity = new HttpEntity<>(payload);
+        HttpHeaders headers = createAuthHeaders(key, secret);
+        HttpEntity<WcProductCreateRequest> entity = new HttpEntity<>(payload, headers);
 
         try {
             ResponseEntity<WcProductResponse> response = restTemplate.exchange(
-                    authUrl,
+                    endpoint,
                     HttpMethod.POST,
                     entity,
                     WcProductResponse.class);
@@ -187,56 +180,51 @@ public class WooCommerceClient {
 
     public Long createDraftProductExtended(String url, String key, String secret, Product product, String appBaseUrl) {
         String endpoint = formatEndpoint(url, "/wp-json/wc/v3/products");
-        String authUrl = UriComponentsBuilder.fromHttpUrl(endpoint)
-                .queryParam("consumer_key", key)
-                .queryParam("consumer_secret", secret)
-                .toUriString();
 
-        java.util.Map<String, Object> payload = new java.util.HashMap<>();
-        payload.put("name", product.getName());
-        payload.put("type", "simple");
-        payload.put("status", "draft");
-        payload.put("sku", product.getSku());
+        WcProductCreateRequest.WcProductCreateRequestBuilder payloadBuilder = WcProductCreateRequest.builder()
+                .name(product.getName())
+                .type("simple")
+                .status("draft")
+                .sku(product.getSku());
 
         if (product.getPrice() != null) {
-            payload.put("regular_price", product.getPrice().toString());
+            payloadBuilder.regularPrice(product.getPrice().toString());
         }
 
         if (product.getStockTotal() != null) {
-            payload.put("manage_stock", true);
-            payload.put("stock_quantity", product.getStockTotal());
+            payloadBuilder.manageStock(true);
+            payloadBuilder.stockQuantity(product.getStockTotal());
         }
 
         if (product.getDescription() != null) {
-            payload.put("description", product.getDescription());
+            payloadBuilder.description(product.getDescription());
         }
 
         if (product.getShortDescription() != null) {
-            payload.put("short_description", product.getShortDescription());
+            payloadBuilder.shortDescription(product.getShortDescription());
         }
 
         if (product.getWeight() != null) {
-            payload.put("weight", product.getWeight().toString());
+            payloadBuilder.weight(product.getWeight().toString());
         }
 
         // Dimensions
-        java.util.Map<String, String> dimensions = new java.util.HashMap<>();
-        dimensions.put("length", product.getLength() != null ? product.getLength().toString() : "");
-        dimensions.put("width", product.getWidth() != null ? product.getWidth().toString() : "");
-        dimensions.put("height", product.getHeight() != null ? product.getHeight().toString() : "");
-        payload.put("dimensions", dimensions);
+        WcProductCreateRequest.Dimensions dimensions = WcProductCreateRequest.Dimensions.builder()
+                .length(product.getLength() != null ? product.getLength().toString() : "")
+                .width(product.getWidth() != null ? product.getWidth().toString() : "")
+                .height(product.getHeight() != null ? product.getHeight().toString() : "")
+                .build();
+        payloadBuilder.dimensions(dimensions);
 
         // Tags
         if (product.getTags() != null && !product.getTags().trim().isEmpty()) {
-            java.util.List<java.util.Map<String, String>> tagList = new java.util.ArrayList<>();
+            java.util.List<WcProductCreateRequest.Tag> tagList = new java.util.ArrayList<>();
             for (String tag : product.getTags().split(",")) {
                 if (!tag.trim().isEmpty()) {
-                    java.util.Map<String, String> tagMap = new java.util.HashMap<>();
-                    tagMap.put("name", tag.trim());
-                    tagList.add(tagMap);
+                    tagList.add(WcProductCreateRequest.Tag.builder().name(tag.trim()).build());
                 }
             }
-            payload.put("tags", tagList);
+            payloadBuilder.tags(tagList);
         }
 
         // Categories
@@ -248,38 +236,33 @@ public class WooCommerceClient {
         }
 
         if (categoryName != null && !categoryName.trim().isEmpty()) {
-            java.util.List<java.util.Map<String, String>> catList = new java.util.ArrayList<>();
-            java.util.Map<String, String> catMap = new java.util.HashMap<>();
-            catMap.put("name", categoryName.trim());
-            catList.add(catMap);
-            payload.put("categories", catList);
+            java.util.List<WcProductCreateRequest.Category> catList = new java.util.ArrayList<>();
+            catList.add(WcProductCreateRequest.Category.builder().name(categoryName.trim()).build());
+            payloadBuilder.categories(catList);
         }
 
         // Metadata (Google and Facebook SEO Fields)
-        java.util.List<java.util.Map<String, Object>> metaList = new java.util.ArrayList<>();
+        java.util.List<WcMetaData> metaList = new java.util.ArrayList<>();
         if (product.getGoogleMetadata() != null && !product.getGoogleMetadata().trim().isEmpty()) {
-            java.util.Map<String, Object> metaMap = new java.util.HashMap<>();
-            metaMap.put("key", "_google_product_metadata");
-            metaMap.put("value", product.getGoogleMetadata());
-            metaList.add(metaMap);
+            metaList.add(WcMetaData.builder()
+                    .key("_google_product_metadata")
+                    .value(product.getGoogleMetadata())
+                    .build());
         }
         if (product.getFacebookMetadata() != null && !product.getFacebookMetadata().trim().isEmpty()) {
-            java.util.Map<String, Object> metaMap = new java.util.HashMap<>();
-            metaMap.put("key", "_facebook_product_metadata");
-            metaMap.put("value", product.getFacebookMetadata());
-            metaList.add(metaMap);
+            metaList.add(WcMetaData.builder()
+                    .key("_facebook_product_metadata")
+                    .value(product.getFacebookMetadata())
+                    .build());
         }
         if (!metaList.isEmpty()) {
-            payload.put("meta_data", metaList);
+            payloadBuilder.metaData(metaList);
         }
 
         // Image Mapping
         if (product.getImageUrl() != null && !product.getImageUrl().isEmpty()) {
-            java.util.List<java.util.Map<String, String>> imgList = new java.util.ArrayList<>();
-            java.util.Map<String, String> imgMap = new java.util.HashMap<>();
-            
+            java.util.List<WcProductCreateRequest.Image> imgList = new java.util.ArrayList<>();
             String absoluteImgUrl = product.getImageUrl();
-            // If the image is locally served, construct the Docker-accessible address
             if (!absoluteImgUrl.startsWith("http")) {
                 String baseUrl = (appBaseUrl != null) ? appBaseUrl : "http://host.docker.internal:8080";
                 if (baseUrl.endsWith("/")) {
@@ -287,16 +270,18 @@ public class WooCommerceClient {
                 }
                 absoluteImgUrl = baseUrl + (absoluteImgUrl.startsWith("/") ? "" : "/") + absoluteImgUrl;
             }
-            imgMap.put("src", absoluteImgUrl);
-            imgList.add(imgMap);
-            payload.put("images", imgList);
+            imgList.add(WcProductCreateRequest.Image.builder().src(absoluteImgUrl).build());
+            payloadBuilder.images(imgList);
         }
 
-        HttpEntity<java.util.Map<String, Object>> entity = new HttpEntity<>(payload);
+        WcProductCreateRequest payload = payloadBuilder.build();
+
+        HttpHeaders headers = createAuthHeaders(key, secret);
+        HttpEntity<WcProductCreateRequest> entity = new HttpEntity<>(payload, headers);
 
         try {
             ResponseEntity<WcProductResponse> response = restTemplate.exchange(
-                    authUrl,
+                    endpoint,
                     HttpMethod.POST,
                     entity,
                     WcProductResponse.class);
