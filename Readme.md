@@ -327,6 +327,15 @@ Para lograr capturas de pantalla ultra-profesionales de la UI para tu portafolio
 
 ---
 
+## 📜 Historia del Proyecto
+
+Este sistema evolucionó desde una aplicación Vaadin más pequeña de gestión de catálogo
+(`ProductsApp`, ya retirada) que resolvía el ABM de productos, clientes y coeficientes de precio,
+pero sin control de stock multi-depósito ni integración con WooCommerce. Este repositorio es la
+versión que quedó en producción y la que se mantiene.
+
+---
+
 ## 👨‍💻 Autor & Contacto
 **Gerardo Maidana** — *Backend Developer | Java & Spring Boot Specialist*
 *   [LinkedIn](https://linkedin.com/in/gerardomaidana)
