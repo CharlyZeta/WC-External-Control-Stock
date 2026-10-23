@@ -9,6 +9,8 @@ target/
 ## Maven
 .mvn/wrapper/maven-wrapper.jar
 !.mvn/wrapper/maven-wrapper.properties
+# No versionar una distribucion completa de Maven: el wrapper la baja solo
+.mvn/maven/
 
 ## IDE
 .idea/
