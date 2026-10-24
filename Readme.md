@@ -217,6 +217,10 @@ erDiagram
     supplier_price_rule }|--|| supplier : "aplica a"
 ```
 
+> **Nota sobre el historial:** el commit inicial incluye el bundle generado del frontend
+> (Vaadin / `frontend/generated/`), que explica el volumen de líneas. El código de negocio está
+> en `src/main/java/com/stockdual/`.
+
 ---
 
 ## 🖥️ Showcase & Capturas de la Interfaz
@@ -285,8 +289,10 @@ La aplicación lee la configuración desde `src/main/resources/application.yml`.
 | :--- | :--- | :--- | :--- |
 | `DB_URL` | Dirección de conexión JDBC para PostgreSQL | `jdbc:postgresql://localhost:5433/stockdual` | `jdbc:postgresql://postgres_host:5432/db_prod` |
 | `DB_USER` | Usuario de la base de datos | `stockdual` | `admin_user` |
-| `DB_PASSWORD` | Contraseña de la base de datos | `stockdual_dev_2024` | `MiClaveSegura123` |
+| `DB_PASSWORD` | Contraseña de la base de datos | `localdev` | `MiClaveSegura123` |
 | `SERVER_PORT` | Puerto de escucha del servidor web | `8080` | `9000` |
+
+El repositorio incluye un archivo `.env.example` con los valores de desarrollo, que puede copiar a `.env` para configurar el entorno local.
 
 ### 3. Ejecutar la Aplicación en Desarrollo
 Inicie la aplicación con el comando predeterminado de Maven:
@@ -333,6 +339,30 @@ Este sistema evolucionó desde una aplicación Vaadin más pequeña de gestión 
 (`ProductsApp`, ya retirada) que resolvía el ABM de productos, clientes y coeficientes de precio,
 pero sin control de stock multi-depósito ni integración con WooCommerce. Este repositorio es la
 versión que quedó en producción y la que se mantiene.
+
+---
+
+## ⚖️ Decisiones y Trade-offs
+
+### Vaadin en lugar de un SPA separado
+
+**Decisión:** el frontend vive en el mismo artefacto Java, no como SPA independiente.
+**Por qué:** un solo deploy, un solo lenguaje, y el equipo es de backend.
+**Costo:** el bundle generado pesa en el repo y en el arranque; para UI muy custom Vaadin
+impone su modelo de componentes. Si el frontend creciera, habría que separarlo.
+
+### Stock multi-depósito en columnas, no en un libro de movimientos
+
+**Decisión:** cada producto guarda su stock por ubicación en columnas (`stock_local`,
+`stock_deposito`, `stock_galpon`) y el total se materializa en `stock_total`, recalculado en cada
+guardado.
+**Por qué:** la grilla tipo Excel, el POS y el dashboard necesitan el stock por depósito y el
+total ya resueltos; con un libro de movimientos cada lectura sería una agregación y el grid
+dejaría de ser instantáneo sobre miles de productos.
+**Costo:** no hay trazabilidad por movimiento (no se reconstruye quién descontó qué ni cuándo) y
+la última escritura gana si dos sesiones editan el mismo producto, porque no hay bloqueo
+optimista. Si el negocio necesitara auditoría de stock, habría que introducir un ledger y migrar
+los totales.
 
 ---
 
