@@ -226,7 +226,7 @@ erDiagram
 ## 🖥️ Showcase & Capturas de la Interfaz
 
 > [!NOTE]
-> Las vistas principales están descritas abajo. **Las capturas todavía no están en el repositorio**: cada vista indica dónde iría la suya y la guía al final de este documento explica cómo generarlas.
+> Las vistas principales están descritas abajo. **Las capturas todavía no están en el repositorio**: cada vista indica dónde iría la suya.
 
 ### 1. Panel de Control de Stock (Excel-Like Grid)
 Grilla compacta optimizada para operaciones rápidas. Permite auditar SKU, código GTIN, marca, stock total y distribuciones físicas locales. Los registros con inconsistencias de inventario con respecto a WooCommerce se destacan visualmente de forma inmediata.
@@ -321,24 +321,6 @@ El núcleo financiero y los cálculos de márgenes se verifican mediante suites 
 ```bash
 ./mvnw test
 ```
-
----
-
-## 📸 Guía para Capturar Pantallas de Alta Calidad (Chrome DevTools)
-
-Para lograr capturas de pantalla ultra-profesionales de la UI para tu portafolio sin marcos del sistema operativo, barras de herramientas o extensiones del navegador, sigue estos pasos utilizando Google Chrome:
-
-1.  **Ingresa al Sistema**: Ejecuta la aplicación e inicia sesión en [http://localhost:8080](http://localhost:8080).
-2.  **Abre las Herramientas de Desarrollador**: Presiona `F12` o `Ctrl + Shift + I` (Windows/Linux).
-3.  **Habilita el Menú de Comandos**: Presiona `Ctrl + Shift + P`.
-4.  **Capturar Pantalla de Área o Completa**:
-    *   Escribe `screenshot` en la barra de búsqueda.
-    *   Selecciona **Capture full size screenshot** para guardar toda la página (ideal para grillas extensas).
-    *   Selecciona **Capture node screenshot** (habiendo seleccionado previamente la etiqueta `<div id="content">` o similar en la pestaña Elements) para obtener la vista limpia del dashboard.
-5.  **Simular Dispositivo Móvil (Para el Creador de Productos)**:
-    *   Haz clic en el icono de **Toggle Device Toolbar** (`Ctrl + Shift + M`).
-    *   Elige un dispositivo (ej. *iPhone 14 Pro* o *Pixel 7*).
-    *   Abre el menú de comandos (`Ctrl + Shift + P`) y ejecuta **Capture screenshot** para obtener el mockup móvil perfecto.
 
 ---
 
