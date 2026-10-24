@@ -226,45 +226,33 @@ erDiagram
 ## 🖥️ Showcase & Capturas de la Interfaz
 
 > [!NOTE]
-> Las siguientes secciones representan las vistas principales del sistema. Los placeholders indican la ubicación de las capturas de pantalla de alta resolución.
+> Las vistas principales están descritas abajo. **Las capturas todavía no están en el repositorio**: cada vista indica dónde iría la suya y la guía al final de este documento explica cómo generarlas.
 
 ### 1. Panel de Control de Stock (Excel-Like Grid)
 Grilla compacta optimizada para operaciones rápidas. Permite auditar SKU, código GTIN, marca, stock total y distribuciones físicas locales. Los registros con inconsistencias de inventario con respecto a WooCommerce se destacan visualmente de forma inmediata.
 
-<figure>
-  <img src="docs/screenshots/stock_control_view.png" alt="Control de Stock" width="100%" />
-  <figcaption align="center"><b>Figura 1:</b> Vista del Panel de Stock. Grilla con edición interactiva inline, filtros cruzados por categorías y resaltado de discrepancias.</figcaption>
-</figure>
+> *📷 Captura pendiente: esta vista todavía no tiene imagen en el repositorio.*
 
 ---
 
 ### 2. Creador Inteligente de Productos (IA Gemini)
 Módulo adaptativo optimizado para dispositivos móviles y de escritorio. Utiliza la cámara del celular para capturar la foto del producto, procesarla a blanco puro, y enviar los bytes a la API de Gemini para autocompletar el formulario de WooCommerce.
 
-<figure>
-  <img src="docs/screenshots/product_creator_view.png" alt="Creador de Productos con IA" width="100%" />
-  <figcaption align="center"><b>Figura 2:</b> Interfaz del Creador de Productos. Carga de foto nativa, barra de progreso del análisis de Gemini e inputs autocompletados.</figcaption>
-</figure>
+> *📷 Captura pendiente: esta vista todavía no tiene imagen en el repositorio.*
 
 ---
 
 ### 3. Formador de Precios (Planilla de Costos)
 Módulo de cálculo reactivo donde los costos se procesan en cascada dinámica (descuentos sucesivos, impuestos e IVA, logística y márgenes de utilidad) para fijar precios comerciales de venta final y lista.
 
-<figure>
-  <img src="docs/screenshots/price_formulator_view.png" alt="Formador de Precios" width="100%" />
-  <figcaption align="center"><b>Figura 3:</b> Panel de Formación de Precios. Tabla matemática para determinar precios de venta sobre costos base del proveedor.</figcaption>
-</figure>
+> *📷 Captura pendiente: esta vista todavía no tiene imagen en el repositorio.*
 
 ---
 
 ### 4. Ajustes del Sistema y Credenciales
 Panel centralizado de configuración donde se administran las API keys de WooCommerce, Gemini AI, umbrales de stock crítico e interfaces de visualización personalizadas.
 
-<figure>
-  <img src="docs/screenshots/settings_view.png" alt="Ajustes del Sistema" width="100%" />
-  <figcaption align="center"><b>Figura 4:</b> Formulario de Ajustes. Configuración del umbral de alerta de inventarios y credenciales de APIs de terceros.</figcaption>
-</figure>
+> *📷 Captura pendiente: esta vista todavía no tiene imagen en el repositorio.*
 
 ---
 
@@ -283,24 +271,45 @@ docker-compose up -d
 ```
 
 ### 2. Configurar Variables de Entorno
-La aplicación lee la configuración desde `src/main/resources/application.yml`. Puede sobrescribir las propiedades clave utilizando las siguientes variables de entorno:
+La aplicación lee la configuración desde `src/main/resources/application.yml`. Estas son **todas** las variables que el sistema consulta:
 
-| Variable de Entorno | Descripción | Valor por Defecto | Ejemplo |
-| :--- | :--- | :--- | :--- |
-| `DB_URL` | Dirección de conexión JDBC para PostgreSQL | `jdbc:postgresql://localhost:5433/stockdual` | `jdbc:postgresql://postgres_host:5432/db_prod` |
-| `DB_USER` | Usuario de la base de datos | `stockdual` | `admin_user` |
-| `DB_PASSWORD` | Contraseña de la base de datos | `localdev` | `MiClaveSegura123` |
-| `SERVER_PORT` | Puerto de escucha del servidor web | `8080` | `9000` |
+| Variable de Entorno | Descripción | Obligatoria | Valor por Defecto | Ejemplo |
+| :--- | :--- | :--- | :--- | :--- |
+| `DB_URL` | Dirección de conexión JDBC para PostgreSQL | No | `jdbc:postgresql://localhost:5433/stockdual` | `jdbc:postgresql://postgres_host:5432/db_prod` |
+| `DB_USER` | Usuario de la base de datos | No | `stockdual` | `admin_user` |
+| `DB_PASSWORD` | Contraseña de la base de datos | No | `localdev` | `MiClaveSegura123` |
+| `SERVER_PORT` | Puerto de escucha del servidor web | No | `8080` | `9000` |
+| `STOCKDUAL_ENCRYPTION_KEY` | Clave AES/GCM con la que se cifran las credenciales de terceros en la base | **Sí** | — (el arranque aborta sin ella) | una cadena de 32 caracteres |
+| `STOCKDUAL_ADMIN_PASSWORD` | Contraseña inicial del usuario `admin` que crea `DataInitializer` | **Sí** | — (el arranque aborta sin ella) | `cambiar-en-produccion` |
 
-El repositorio incluye un archivo `.env.example` con los valores de desarrollo, que puede copiar a `.env` para configurar el entorno local.
+> [!IMPORTANT]
+> Las dos últimas son **obligatorias**: si no están definidas, la aplicación no arranca y lanza `IllegalStateException`. `STOCKDUAL_ENCRYPTION_KEY` se normaliza a 32 bytes, pero conviene usar exactamente 32 caracteres.
+
+**Cómo se cargan** — no es lo mismo para Docker que para la aplicación:
+
+*   **Docker Compose** lee el archivo `.env` de la raíz para interpolar `POSTGRES_PASSWORD` del contenedor. El repositorio trae `.env.example` como plantilla con los valores de desarrollo.
+*   **La aplicación Java no lee `.env`**: Spring resuelve variables de entorno reales. Definilas en la terminal antes de arrancar o en la *Run Configuration* del IDE. El paso siguiente muestra cómo.
 
 ### 3. Ejecutar la Aplicación en Desarrollo
-Inicie la aplicación con el comando predeterminado de Maven:
+Exporte las dos variables obligatorias y arranque con el wrapper. En Windows / PowerShell:
 
-```bash
+```powershell
+$env:STOCKDUAL_ENCRYPTION_KEY = "clave-de-desarrollo-de-32-caracteres"
+$env:STOCKDUAL_ADMIN_PASSWORD = "cambiar-en-produccion"
 ./mvnw spring-boot:run
 ```
+
+En Linux / macOS:
+
+```bash
+export STOCKDUAL_ENCRYPTION_KEY="clave-de-desarrollo-de-32-caracteres"
+export STOCKDUAL_ADMIN_PASSWORD="cambiar-en-produccion"
+./mvnw spring-boot:run
+```
+
 *La base de datos se migrará automáticamente a la versión V13 en el primer inicio mediante Flyway.*
+
+> Si prefiere no exportar las variables en cada terminal, configúrelas en la *Run Configuration* del IDE. La aplicación **no** lee el archivo `.env`: eso lo hace Docker Compose.
 
 Si experimenta problemas con la carga de assets de Vaadin o desea forzar una limpieza profunda del motor de compilación frontend (Vite/Node), ejecute nuestro script de automatización:
 ```powershell
